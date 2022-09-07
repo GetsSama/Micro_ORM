@@ -21,8 +21,8 @@ public class Main {
             }
         }
 
-        System.out.println(getTableSchema(connection, "users"));
-
+        var nameAndAttrib = getTableSchema(connection, "users");
+        String[] values = {};
 
 
         ConnectionManager.close();

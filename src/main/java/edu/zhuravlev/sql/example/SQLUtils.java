@@ -7,7 +7,42 @@ import java.util.function.Function;
 
 public class SQLUtils {
     private SQLUtils(){};
-    private static Map<String, Method> dataTypesMapping = new HashMap<>();
+    private static final Map<String, Method> dataTypesMapping;
+
+    static {
+        try {
+            dataTypesMapping = new HashMap<>(Map.of(
+                    "int4", PreparedStatement.class.getMethod("setInt", int.class, int.class),
+                    "text", PreparedStatement.class.getMethod("setString", int.class, String.class),
+                    "varchar", PreparedStatement.class.getMethod("setString", int.class, String.class)
+            ));
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final Map<String, String> sqlTypeAsJavaType = new HashMap<>(Map.of(
+            "int4" ,"int",
+            "text" , "String",
+            "varchar" , "String"
+    ));
+
+    public static List<Object> getAttributesAsObjs (Map<String, String> nameAndType, String... attributesValues) {
+        List<Object> atrObj = new ArrayList<>(attributesValues.length);
+        int counter = 0;
+
+        for (Map.Entry pair : nameAndType.entrySet()) {
+            String javaType = sqlTypeAsJavaType.get(pair.getValue());
+            if (javaType.equals("int"))
+                atrObj.add(Integer.valueOf(attributesValues[counter]));
+            else if (javaType.equals("String"))
+                atrObj.add(attributesValues[counter]);
+            counter++;
+        }
+
+        return atrObj;
+    }
+
     public static void printSQLException(SQLException ex){
         for (Throwable e: ex) {
             if (e instanceof SQLException) {
@@ -28,23 +63,32 @@ public class SQLUtils {
         Objects.requireNonNull(connection);
         Map<String, String> nameAndType = new LinkedHashMap<>();
 
-        try (ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {
-            if (rs.next()) {
+        if (isDBContainsTable(connection, tableName)) {
                 try (Statement statement = connection.createStatement()) {
                     ResultSet selectedTable = statement.executeQuery("select * from " + tableName + ";");
                     ResultSetMetaData rsmd = selectedTable.getMetaData();
 
                     for (int i=1; i<= rsmd.getColumnCount(); i++)
                         nameAndType.put(rsmd.getColumnLabel(i), rsmd.getColumnTypeName(i));
+                } catch (SQLException e) {
+                    printSQLException(e);
+                    throw new RuntimeException(e);
                 }
-            } else {
+        } else {
                 throw new RuntimeException("In this DB no such tables with this table name!");
-            }
-        } catch (SQLException e) {
-            printSQLException(e);
-            throw new RuntimeException(e);
         }
 
         return nameAndType;
     }
+
+    public static boolean isDBContainsTable (Connection connection, String tableName) {
+        try (ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {
+            return rs.next();
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw  new RuntimeException(e);
+        }
+    }
+
+    //public static void setPrepareStatementParams (PreparedStatement prSt, List<>)
 }
