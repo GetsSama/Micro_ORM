@@ -1,5 +1,6 @@
 package edu.zhuravlev.sql.example;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
@@ -27,7 +28,7 @@ public class SQLUtils {
             "varchar" , "String"
     ));
 
-    public static List<Object> getAttributesAsObjs (Map<String, String> nameAndType, String... attributesValues) {
+    private static List<Object> getAttributesAsObjs (Map<String, String> nameAndType, String... attributesValues) {
         List<Object> atrObj = new ArrayList<>(attributesValues.length);
         int counter = 0;
 
@@ -90,5 +91,24 @@ public class SQLUtils {
         }
     }
 
-    //public static void setPrepareStatementParams (PreparedStatement prSt, List<>)
+    public static void setPrepareStatementParams (PreparedStatement prSt, Map<String, String> nameAndTypes, String... attrValues) {
+        List<Object> attrValuesAsObj = getAttributesAsObjs(nameAndTypes, attrValues);
+        int counter = 0;
+
+        for (Map.Entry pair : nameAndTypes.entrySet()) {
+            Method setMethod = dataTypesMapping.get(pair.getValue());
+
+            try {
+                setMethod.invoke(prSt, counter+1, attrValuesAsObj.get(counter));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+
+            counter++;
+        }
+
+        //System.out.println(prSt);
+    }
 }

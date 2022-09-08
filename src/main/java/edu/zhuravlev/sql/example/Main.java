@@ -1,6 +1,7 @@
 package edu.zhuravlev.sql.example;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Scanner;
 
 import static edu.zhuravlev.sql.example.TableCreator.*;
@@ -22,7 +23,22 @@ public class Main {
         }
 
         var nameAndAttrib = getTableSchema(connection, "users");
-        String[] values = {};
+        String[] values = {"1", "Tony", "tony@gmail.com", "US", "secret"};
+        //List<Object> atr = getAttributesAsObjs(nameAndAttrib, values);
+        String sql = "INSERT INTO users" +
+                "  (id, name, email, country, password) VALUES " +
+                " (?, ?, ?, ?, ?);";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            System.out.println(preparedStatement);
+
+            setPrepareStatementParams(preparedStatement, nameAndAttrib, values);
+
+            System.out.println(preparedStatement);
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
 
 
         ConnectionManager.close();
