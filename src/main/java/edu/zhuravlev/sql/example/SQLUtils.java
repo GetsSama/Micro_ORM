@@ -32,8 +32,8 @@ public class SQLUtils {
         List<Object> atrObj = new ArrayList<>(attributesValues.length);
         int counter = 0;
 
-        for (Map.Entry pair : nameAndType.entrySet()) {
-            String javaType = sqlTypeAsJavaType.get(pair.getValue());
+        for (var key : nameAndType.keySet()) {
+            String javaType = sqlTypeAsJavaType.get(nameAndType.get(key));
             if (javaType.equals("int"))
                 atrObj.add(Integer.valueOf(attributesValues[counter]));
             else if (javaType.equals("String"))
@@ -82,7 +82,7 @@ public class SQLUtils {
         return nameAndType;
     }
 
-    public static boolean isDBContainsTable (Connection connection, String tableName) {
+     static boolean isDBContainsTable (Connection connection, String tableName) {
         try (ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {
             return rs.next();
         } catch (SQLException e) {
@@ -95,8 +95,8 @@ public class SQLUtils {
         List<Object> attrValuesAsObj = getAttributesAsObjs(nameAndTypes, attrValues);
         int counter = 0;
 
-        for (Map.Entry pair : nameAndTypes.entrySet()) {
-            Method setMethod = dataTypesMapping.get(pair.getValue());
+        for (var key : nameAndTypes.keySet()) {
+            Method setMethod = dataTypesMapping.get(nameAndTypes.get(key));
 
             try {
                 setMethod.invoke(prSt, counter+1, attrValuesAsObj.get(counter));
@@ -108,7 +108,6 @@ public class SQLUtils {
 
             counter++;
         }
-
-        //System.out.println(prSt);
     }
+
 }
