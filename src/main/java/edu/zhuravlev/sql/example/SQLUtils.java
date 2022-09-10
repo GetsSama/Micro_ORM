@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
 
-public class SQLUtils {
+class SQLUtils {
     private SQLUtils(){};
     private static final Map<String, Method> dataTypesMapping;
 
