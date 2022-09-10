@@ -29,6 +29,7 @@ public class Main {
                 "  (id, name, email, country, password) VALUES " +
                 " (?, ?, ?, ?, ?);";
 
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             System.out.println(preparedStatement);
 
@@ -39,7 +40,6 @@ public class Main {
             printSQLException(e);
             throw new RuntimeException(e);
         }
-
 
         ConnectionManager.close();
     }
