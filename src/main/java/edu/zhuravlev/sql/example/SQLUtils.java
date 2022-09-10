@@ -1,5 +1,8 @@
 package edu.zhuravlev.sql.example;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
@@ -28,12 +31,18 @@ class SQLUtils {
             "varchar" , "String"
     ));
 
+    public static final BiMap<String, String> typesSQLToJava = ImmutableBiMap.of(
+            "int4", "int",
+            "varchar", "String"
+    );
+
     private static List<Object> getAttributesAsObjs (Map<String, String> nameAndType, String... attributesValues) {
         List<Object> atrObj = new ArrayList<>(attributesValues.length);
         int counter = 0;
 
         for (var key : nameAndType.keySet()) {
-            String javaType = sqlTypeAsJavaType.get(nameAndType.get(key));
+            //String javaType = sqlTypeAsJavaType.get(nameAndType.get(key));
+            String javaType = typesSQLToJava.get(nameAndType.get(key));
             if (javaType.equals("int"))
                 atrObj.add(Integer.valueOf(attributesValues[counter]));
             else if (javaType.equals("String"))

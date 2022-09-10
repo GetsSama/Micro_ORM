@@ -1,37 +1,45 @@
 package edu.zhuravlev.sql.example;
 
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 class EntityKeeperImpl implements EntityKeeper {
 
-    private final String[] attributesName;
-    private final String[] attributesType;
+    private final Map<String, String> fieldsNameAndType;
     private final Connection connection;
     private final String tableName;
 
-    public EntityKeeperImpl(String[] attributesName, String[] attributesType, Connection connection, String tableName) {
-        Objects.requireNonNull(attributesName);
-        Objects.requireNonNull(attributesType);
+    private boolean isDBHaveMapping;
+
+
+    public EntityKeeperImpl(Map<String, String> fieldsNameAndType, Connection connection, String tableName) {
+        Objects.requireNonNull(fieldsNameAndType);
         Objects.requireNonNull(connection);
         Objects.requireNonNull(tableName);
 
-        this.attributesName = attributesName;
-        this.attributesType = attributesType;
+        this.fieldsNameAndType = fieldsNameAndType;
         this.connection = connection;
         this.tableName = tableName;
+
+        isDBHaveMapping = SQLUtils.isDBContainsTable(connection, tableName);
     }
 
-    private boolean isFirstSave = true;
 
     @Override
     public void save(Object entity) {
-
+        System.out.println(SQLCreator.CREATE_STATEMENT(tableName,fieldsNameAndType));
     }
 
     @Override
     public void save(List<Object> entityList) {
+
+    }
+
+    @Override
+    public void update(Object entity) {
 
     }
 
@@ -58,5 +66,13 @@ class EntityKeeperImpl implements EntityKeeper {
     @Override
     public void dropTable() {
 
+    }
+
+    @Override
+    public String toString() {
+        return "EntityKeeperImpl{" +
+                "fieldsNameAndType=" + fieldsNameAndType +
+                ", tableName='" + tableName + '\'' +
+                '}';
     }
 }

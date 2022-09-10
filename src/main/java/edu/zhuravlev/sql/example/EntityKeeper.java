@@ -8,6 +8,8 @@ public interface EntityKeeper {
 
     void save(List<Object> entityList);
 
+    void update(Object entity);
+
     Object read(String id);
 
     List<Object> readAll();

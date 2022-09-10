@@ -1,6 +1,7 @@
 package edu.zhuravlev.sql.example;
 
 import java.sql.Connection;
+import java.util.Map;
 import java.util.Objects;
 
 public class KeeperFactory {
@@ -13,11 +14,10 @@ public class KeeperFactory {
         if (KeeperPool.isContainsMapping(entityClass))
             return KeeperPool.getMapping(entityClass);
         else {
-            String[] fieldsName = EntityAnalyser.getFieldsName(entityClass);
-            String[] fieldsType = EntityAnalyser.getFieldsType(entityClass);
+            Map<String, String> fieldsNameAndType = EntityAnalyser.getFieldsNameAndType(entityClass);
             String tableName = entityClass.getSimpleName();
 
-            EntityKeeper entityKeeper = new EntityKeeperImpl(fieldsName, fieldsType, connection, tableName);
+            EntityKeeper entityKeeper = new EntityKeeperImpl(fieldsNameAndType, connection, tableName);
             KeeperPool.addMapping(entityClass, entityKeeper);
 
             return entityKeeper;

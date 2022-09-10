@@ -1,12 +1,11 @@
 package edu.zhuravlev.sql.exampleTest;
 
 import edu.zhuravlev.sql.example.ConnectionManager;
+import edu.zhuravlev.sql.example.EntityKeeper;
+import edu.zhuravlev.sql.example.KeeperFactory;
 
 import java.sql.*;
-import java.util.List;
 import java.util.Scanner;
-
-import static edu.zhuravlev.sql.example.TableCreator.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,14 +15,15 @@ public class Main {
             while (scn.hasNext()) {
                 String input = scn.next();
                 if (input.equals("create")) {
-                    setConnection(connection);
-                    createDefaultTable();
+
                 } else if (input.equals("1"))
                     break;
             }
         }
 
-
+        EntityKeeper userKeeper = KeeperFactory.createEntityKeeper(User.class, connection);
+        System.out.println(userKeeper);
+        userKeeper.save(new Object());
 
         ConnectionManager.close();
     }

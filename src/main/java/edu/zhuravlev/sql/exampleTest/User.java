@@ -1,4 +1,4 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.exampleTest;
 
 import java.util.Objects;
 
