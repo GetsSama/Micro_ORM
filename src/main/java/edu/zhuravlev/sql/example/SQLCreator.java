@@ -14,7 +14,7 @@ class SQLCreator {
 
     private static final String CREATE_TEMPLATE = "CREATE TABLE %s ";
 
-    public static String CREATE_STATEMENT(String tableName, Map<String, String> fieldsNameAndType) {
+    public static String getCreateStatement(String tableName, Map<String, String> fieldsNameAndType) {
         String firstPart = String.format(CREATE_TEMPLATE, tableName);
         int size = fieldsNameAndType.size();
         int counter = 1;
@@ -41,5 +41,61 @@ class SQLCreator {
         builder.append(")");
 
         return builder.toString();
+    }
+
+    public static String getSelectStatement(String tableName, String id) {
+        String firstPart = "SELECT * FROM " + tableName;
+        String secondPart = " WHERE id=" + id;
+        return firstPart + secondPart;
+    }
+
+    public static String getInsertStatement(String tableName, Map<String, String> fieldsNameAndType, String[] values) {
+        String firstPart = "INSERT INTO " + tableName + " (";
+        StringBuilder builder = new StringBuilder(firstPart);
+        StringBuilder builderValues = new StringBuilder("(");
+        int size = fieldsNameAndType.size();
+        int counter = 1;
+
+        for (var pair : fieldsNameAndType.entrySet()) {
+            if (counter != size) {
+                builder.append(pair.getKey() + ", ");
+                builderValues.append(pair.getValue() + ", ");
+            } else {
+                builder.append(pair.getKey() + ") VALUES ");
+                builderValues.append(pair.getValue() + ")");
+            }
+            counter++;
+        }
+
+        return builder.toString() + builderValues.toString();
+    }
+
+    public static String getUpdateStatement(String tableName, Map<String, String> updatableFieldAndValue, String id) {
+        String firstPart = "UPDATE " + tableName + " SET ";
+        StringBuilder builder = new StringBuilder(firstPart);
+        int size = updatableFieldAndValue.size();
+        int counter = 1;
+
+        for (var pair : updatableFieldAndValue.entrySet()) {
+            if (counter != size)
+                builder.append(pair.getKey() + "=" + pair.getValue() + ", ");
+            else
+                builder.append(pair.getKey() + "=" + pair.getValue() + " ");
+
+            counter++;
+        }
+
+        builder.append("WHERE id=" + id);
+
+        return builder.toString();
+    }
+
+    public static String getDeleteStatement(String tableName, String id) {
+        String firstPart = "DELETE FROM %s WHERE id=%s";
+        return String.format(firstPart, tableName, id);
+    }
+
+    public static String getDropStatement(String tableName) {
+        return "DROP TABLE " + tableName;
     }
 }
