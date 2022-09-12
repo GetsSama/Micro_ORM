@@ -32,16 +32,18 @@ class EntityKeeperImpl implements EntityKeeper {
 
     @Override
     public void save(List<Object> entityList) {
-
+        System.out.println(SQLCreator.getInsertStatement(tableName, fieldsNameAndType, new String[] {"2", "Sveta", "mathandmath", "RU", "secret"}));
     }
 
     @Override
     public void update(Object entity) {
         var updated = new HashMap<>(Map.of("name", "Kolya", "email", "zurik.new"));
+        System.out.println(SQLCreator.getUpdateStatement(tableName, updated, "1"));
     }
 
     @Override
     public Object read(String id) {
+        System.out.println(SQLCreator.getSelectStatement(tableName, "1"));
         return null;
     }
 
@@ -52,7 +54,7 @@ class EntityKeeperImpl implements EntityKeeper {
 
     @Override
     public void delete(String id) {
-
+        System.out.println(SQLCreator.getDeleteStatement(tableName, "2"));
     }
 
     @Override
@@ -62,7 +64,7 @@ class EntityKeeperImpl implements EntityKeeper {
 
     @Override
     public void dropTable() {
-
+        System.out.println(SQLCreator.getDropStatement(tableName));
     }
 
     @Override

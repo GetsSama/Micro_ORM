@@ -3,13 +3,6 @@ package edu.zhuravlev.sql.example;
 import java.util.Map;
 
 class SQLCreator {
-    private static final String createTableSQL = "CREATE TABLE users " +
-            "(ID INT PRIMARY KEY ," +
-            " NAME TEXT, " +
-            " EMAIL VARCHAR(50), " +
-            " COUNTRY VARCHAR(50), " +
-            " PASSWORD VARCHAR(50))";
-
     private SQLCreator() {};
 
     private static final String CREATE_TEMPLATE = "CREATE TABLE %s ";
@@ -59,10 +52,10 @@ class SQLCreator {
         for (var pair : fieldsNameAndType.entrySet()) {
             if (counter != size) {
                 builder.append(pair.getKey() + ", ");
-                builderValues.append(pair.getValue() + ", ");
+                builderValues.append(values[counter-1] + ", ");
             } else {
                 builder.append(pair.getKey() + ") VALUES ");
-                builderValues.append(pair.getValue() + ")");
+                builderValues.append(values[counter-1] + ")");
             }
             counter++;
         }
