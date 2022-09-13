@@ -31,7 +31,7 @@ class SQLCreator {
             counter++;
         }
 
-        builder.append(")");
+        builder.append(");");
 
         return builder.toString();
     }

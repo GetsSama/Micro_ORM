@@ -2,7 +2,7 @@ package edu.zhuravlev.sql.exampleTest;
 
 import java.util.Objects;
 
-public class User {
+public class Person {
 
     private int id;
     private String name;
@@ -10,7 +10,7 @@ public class User {
     private String country;
     private String password;
 
-    public User(int id, String name, String email, String country, String password) {
+    public Person(int id, String name, String email, String country, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -61,9 +61,9 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return id == user.id && name.equals(user.name) && email.equals(user.email) && country.equals(user.country) && password.equals(user.password);
+        if (!(o instanceof Person)) return false;
+        Person person = (Person) o;
+        return id == person.id && name.equals(person.name) && email.equals(person.email) && country.equals(person.country) && password.equals(person.password);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User = {id=" + id + ", name=" + name +
+        return "Person = {id=" + id + ", name=" + name +
                 ", email=" + email + ", country=" + country +
                 ", password=" + password + "}";
     }

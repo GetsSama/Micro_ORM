@@ -1,6 +1,9 @@
 package edu.zhuravlev.sql.example;
 
+import java.lang.reflect.Type;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 class EntityKeeperImpl implements EntityKeeper {
@@ -8,11 +11,11 @@ class EntityKeeperImpl implements EntityKeeper {
     private final Map<String, String> fieldsNameAndType;
     private final Connection connection;
     private final String tableName;
-
+    private final Class thisEntityClass;
     private boolean isDBHaveMapping;
 
 
-    public EntityKeeperImpl(Map<String, String> fieldsNameAndType, Connection connection, String tableName) {
+    public EntityKeeperImpl(Class entityClass, Map<String, String> fieldsNameAndType, Connection connection, String tableName) {
         Objects.requireNonNull(fieldsNameAndType);
         Objects.requireNonNull(connection);
         Objects.requireNonNull(tableName);
@@ -22,12 +25,33 @@ class EntityKeeperImpl implements EntityKeeper {
         this.tableName = tableName;
 
         isDBHaveMapping = SQLUtils.isDBContainsTable(connection, tableName);
+        thisEntityClass = entityClass;
     }
 
+    private boolean create() {
+        try(Statement statement = connection.createStatement()) {
+            String sqlStatement = SQLCreator.getCreateStatement(tableName, fieldsNameAndType);
+            System.out.println(sqlStatement);
+            return statement.execute(sqlStatement);
+        } catch (SQLException e) {
+            SQLUtils.printSQLException(e);
+            throw new RuntimeException(e);
+        }
+    }
 
+    private void typeCheck(Object o) {
+        Objects.requireNonNull(o);
+        Class objClass = o.getClass();
+        if(!Objects.equals(objClass, thisEntityClass))
+            throw new RuntimeException("Uncorrected entity object type!");
+    }
     @Override
     public void save(Object entity) {
-        System.out.println(SQLCreator.getCreateStatement(tableName,fieldsNameAndType));
+        typeCheck(entity);
+
+        if (!isDBHaveMapping)
+            create();
+
     }
 
     @Override
@@ -72,6 +96,7 @@ class EntityKeeperImpl implements EntityKeeper {
         return "EntityKeeperImpl{" +
                 "fieldsNameAndType=" + fieldsNameAndType +
                 ", tableName='" + tableName + '\'' +
+                ", thisEntityClass=" + thisEntityClass +
                 '}';
     }
 }
