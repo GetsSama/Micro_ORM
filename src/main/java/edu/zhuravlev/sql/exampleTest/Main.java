@@ -14,6 +14,7 @@ public class Main {
 
         Person person = new Person(1, "Nikolay", "zurik.n", "RU", "secret");
         Person person2 = new Person(2, "Sveta", "mathandmath", "RU", "secret");
+        Person person3 = new Person(3, "John", "john.mail.eu", "EU", "secret");
         EntityKeeper userKeeper = KeeperFactory.createEntityKeeper(Person.class, connection);
         System.out.println(userKeeper);
 
@@ -24,6 +25,8 @@ public class Main {
                     userKeeper.save(person);
                 else if (input.equals("Sveta"))
                     userKeeper.save(person2);
+                else if (input.equals("John"))
+                    userKeeper.save(person3);
                 else if (input.equals("1"))
                     break;
             }

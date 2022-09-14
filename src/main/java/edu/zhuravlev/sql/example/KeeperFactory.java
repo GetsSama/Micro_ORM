@@ -15,7 +15,7 @@ public class KeeperFactory {
             return KeeperPool.getMapping(entityClass);
         else {
             Map<String, String> fieldsNameAndType = EntityAnalyser.getFieldsNameAndType(entityClass);
-            String tableName = entityClass.getSimpleName();
+            String tableName = entityClass.getSimpleName().toLowerCase();
 
             EntityKeeper entityKeeper = new EntityKeeperImpl(entityClass, fieldsNameAndType, connection, tableName);
             KeeperPool.addMapping(entityClass, entityKeeper);
