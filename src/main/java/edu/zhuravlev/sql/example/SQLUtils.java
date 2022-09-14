@@ -92,7 +92,7 @@ class SQLUtils {
     }
 
      static boolean isDBContainsTable (Connection connection, String tableName) {
-        try (ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {
+        try (ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName.toLowerCase(), null)) {
             return rs.next();
         } catch (SQLException e) {
             printSQLException(e);
