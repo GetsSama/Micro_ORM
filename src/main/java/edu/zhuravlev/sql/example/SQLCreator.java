@@ -52,10 +52,10 @@ class SQLCreator {
         for (var pair : fieldsNameAndType.entrySet()) {
             if (counter != size) {
                 builder.append(pair.getKey() + ", ");
-                builderValues.append(values[counter-1] + ", ");
+                builderValues.append("'" + values[counter-1] + "'" + ", ");
             } else {
                 builder.append(pair.getKey() + ") VALUES ");
-                builderValues.append(values[counter-1] + ")");
+                builderValues.append("'" + values[counter-1]+ "'" + ")");
             }
             counter++;
         }

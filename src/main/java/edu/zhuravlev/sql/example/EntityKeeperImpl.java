@@ -28,11 +28,11 @@ class EntityKeeperImpl implements EntityKeeper {
         thisEntityClass = entityClass;
     }
 
-    private boolean create() {
+    private int create() {
         try(Statement statement = connection.createStatement()) {
             String sqlStatement = SQLCreator.getCreateStatement(tableName, fieldsNameAndType);
-            System.out.println(sqlStatement);
-            return statement.execute(sqlStatement);
+            System.out.println("Generated SQL -----> " + sqlStatement);
+            return statement.executeUpdate(sqlStatement);
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
@@ -45,6 +45,7 @@ class EntityKeeperImpl implements EntityKeeper {
         if(!Objects.equals(objClass, thisEntityClass))
             throw new RuntimeException("Uncorrected entity object type!");
     }
+
     @Override
     public void save(Object entity) {
         typeCheck(entity);
@@ -52,6 +53,17 @@ class EntityKeeperImpl implements EntityKeeper {
         if (!isDBHaveMapping)
             create();
 
+        String[] values = EntityAnalyser.getValues(entity, fieldsNameAndType);
+        String insertSQL = SQLCreator.getInsertStatement(tableName, fieldsNameAndType, values);
+        System.out.println("Generated SQL -----> " + insertSQL);
+
+        try (Statement statement = connection.createStatement()) {
+            int updRows = statement.executeUpdate(insertSQL);
+            System.out.println("Execute: inserted " + updRows + " rows");
+        } catch (SQLException e) {
+            SQLUtils.printSQLException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
