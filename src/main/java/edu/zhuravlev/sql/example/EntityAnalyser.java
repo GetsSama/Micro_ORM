@@ -66,6 +66,7 @@ class EntityAnalyser {
     }
 
     public static String[] getValues(Object o, Map<String, String> fieldsNameAndType) {
+        Objects.requireNonNull(o);
         String[] values = new String[fieldsNameAndType.size()];
         //String[] methodsName = new String[fieldsNameAndType.size()];
         int counter = 0;
@@ -85,5 +86,19 @@ class EntityAnalyser {
             counter++;
         }
         return values;
+    }
+
+    public static String getId(Object o) {
+        Objects.requireNonNull(o);
+        try {
+            Object value = o.getClass().getMethod("getId").invoke(o);
+            return value.toString();
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

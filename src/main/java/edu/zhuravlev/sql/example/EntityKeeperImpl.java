@@ -1,10 +1,11 @@
 package edu.zhuravlev.sql.example;
 
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+
+import static edu.zhuravlev.sql.example.SQLUtils.*;
 
 class EntityKeeperImpl implements EntityKeeper {
 
@@ -24,8 +25,8 @@ class EntityKeeperImpl implements EntityKeeper {
         this.connection = connection;
         this.tableName = tableName;
 
-        isDBHaveMapping = SQLUtils.isDBContainsTable(connection, tableName);
         thisEntityClass = entityClass;
+        isDBHaveMapping = SQLUtils.isDBContainsMapping(connection,thisEntityClass);
     }
 
     private int create() {
@@ -55,11 +56,11 @@ class EntityKeeperImpl implements EntityKeeper {
 
         String[] values = EntityAnalyser.getValues(entity, fieldsNameAndType);
         String insertSQL = SQLCreator.getInsertStatement(tableName, fieldsNameAndType, values);
-        System.out.println("Generated SQL -----> " + insertSQL);
+        printGeneratedSQL(insertSQL);
 
         try (Statement statement = connection.createStatement()) {
             int updRows = statement.executeUpdate(insertSQL);
-            System.out.println("Execute: inserted " + updRows + " rows");
+            printExecutedResult(updRows, "inserted");
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
@@ -89,8 +90,22 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void delete(String id) {
-        System.out.println(SQLCreator.getDeleteStatement(tableName, "2"));
+    public void delete(Object entity) {
+        typeCheck(entity);
+        if(!isDBHaveMapping)
+            throw new RuntimeException("DB don't have mapping for this entity");
+
+        String idValue = EntityAnalyser.getId(entity);
+        String deleteSQL = SQLCreator.getDeleteStatement(tableName, idValue);
+        printGeneratedSQL(deleteSQL);
+
+        try(Statement statement = connection.createStatement()) {
+            int updRows = statement.executeUpdate(deleteSQL);
+            printExecutedResult(updRows, "deleted");
+        } catch (SQLException e) {
+            SQLUtils.printSQLException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

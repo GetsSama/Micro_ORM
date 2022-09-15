@@ -3,6 +3,9 @@ package edu.zhuravlev.sql.example;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
+import javax.sql.RowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
@@ -25,11 +28,11 @@ class SQLUtils {
         }
     }
 
-    private static final Map<String, String> sqlTypeAsJavaType = new HashMap<>(Map.of(
+    /*private static final Map<String, String> sqlTypeAsJavaType = new HashMap<>(Map.of(
             "int4" ,"int",
             "text" , "String",
             "varchar" , "String"
-    ));
+    ));*/
 
     public static final BiMap<String, String> typesSQLToJava = ImmutableBiMap.of(
             "int4", "int",
@@ -69,36 +72,46 @@ class SQLUtils {
         }
     }
 
-    public static Map<String, String> getTableSchema(Connection connection, String tableName) {
+     static boolean isDBContainsMapping (Connection connection, Class entityClass) {
         Objects.requireNonNull(connection);
-        Map<String, String> nameAndType = new LinkedHashMap<>();
+        Objects.requireNonNull(entityClass);
 
-        if (isDBContainsTable(connection, tableName)) {
-                try (Statement statement = connection.createStatement()) {
-                    ResultSet selectedTable = statement.executeQuery("select * from " + tableName + ";");
-                    ResultSetMetaData rsmd = selectedTable.getMetaData();
+        List<String> entityFields = Arrays.asList(EntityAnalyser.getFieldsName(entityClass));
+        List<String> tableFieldsName = new ArrayList<>();
+        String tableName = entityClass.getSimpleName().toLowerCase();
+        String query = "SELECT * FROM " + tableName + " LIMIT 3";
 
-                    for (int i=1; i<= rsmd.getColumnCount(); i++)
-                        nameAndType.put(rsmd.getColumnLabel(i), rsmd.getColumnTypeName(i));
-                } catch (SQLException e) {
-                    printSQLException(e);
-                    throw new RuntimeException(e);
-                }
-        } else {
-                throw new RuntimeException("In this DB no such tables with this table name!");
-        }
-
-        return nameAndType;
-    }
-
-     static boolean isDBContainsTable (Connection connection, String tableName) {
-        try (ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName.toLowerCase(), null)) {
-            return rs.next();
+        try(ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {
+            if (!rs.next())
+                return false;
         } catch (SQLException e) {
             printSQLException(e);
-            throw  new RuntimeException(e);
+            throw new RuntimeException(e);
         }
-    }
+
+        try(Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnsCount = metaData.getColumnCount();
+            for (int i=1; i<=columnsCount; i++)
+                tableFieldsName.add(metaData.getColumnLabel(i));
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
+
+        if (entityFields.size() == tableFieldsName.size()) {
+            Iterator<String> iteratorEntity = entityFields.iterator();
+            for (int i=0; i<entityFields.size(); i++) {
+                String field = iteratorEntity.next();
+                if(!field.equalsIgnoreCase(tableFieldsName.get(i)))
+                    return false;
+            }
+        } else
+            return false;
+
+        return true;
+     }
 
     public static void setPrepareStatementParams (PreparedStatement prSt, Map<String, String> nameAndTypes, String... attrValues) {
         List<Object> attrValuesAsObj = getAttributesAsObjs(nameAndTypes, attrValues);
@@ -109,14 +122,20 @@ class SQLUtils {
 
             try {
                 setMethod.invoke(prSt, counter+1, attrValuesAsObj.get(counter));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
 
             counter++;
         }
+    }
+
+    public static void printGeneratedSQL(String sql) {
+        System.out.println("Generated SQL -----> " + sql);
+    }
+
+    public static void printExecutedResult(int number, String operation) {
+        System.out.println("Executed result: " + operation + " " + number + " rows");
     }
 
 }

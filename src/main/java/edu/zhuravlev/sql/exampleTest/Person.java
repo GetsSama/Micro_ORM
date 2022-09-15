@@ -10,6 +10,7 @@ public class Person {
     private String country;
     private String password;
 
+    public Person() {};
     public Person(int id, String name, String email, String country, String password) {
         this.id = id;
         this.name = name;

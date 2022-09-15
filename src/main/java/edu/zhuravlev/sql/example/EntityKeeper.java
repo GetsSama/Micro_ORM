@@ -14,7 +14,7 @@ public interface EntityKeeper {
 
     List<Object> readAll();
 
-    void delete(String id);
+    void delete(Object entity);
 
     void delete(List<String> deletedEntities);
 
