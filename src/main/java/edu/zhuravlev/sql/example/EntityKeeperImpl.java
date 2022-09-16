@@ -1,6 +1,8 @@
 package edu.zhuravlev.sql.example;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
@@ -106,14 +108,71 @@ class EntityKeeperImpl implements EntityKeeper {
 
     @Override
     public void update(Object entity) {
-        var updated = new HashMap<>(Map.of("name", "Kolya", "email", "zurik.new"));
-        System.out.println(SQLCreator.getUpdateStatement(tableName, updated, "1"));
+        typeCheck(entity);
+        if(!isDBHaveMapping)
+            throw new RuntimeException("DB don't have mapping for this entity");
+
+        List<String> valuesEntity = Arrays.asList(EntityAnalyser.getValues(entity, fieldsNameAndType));
+        Map<String, String> fieldAndValue = new HashMap<>();
+        Iterator<String> valIter = valuesEntity.iterator();
+
+        for(var field : fieldsNameAndType.keySet())
+            fieldAndValue.put(field, valIter.next());
+
+
+        Object equivalentEntity = read(fieldAndValue.get("id"));
+        List<String> valuesEntityInDB = Arrays.asList(EntityAnalyser.getValues(equivalentEntity, fieldsNameAndType));
+        Iterator<String> oldIter = valuesEntityInDB.iterator();
+        Iterator<String> newIter = valuesEntity.iterator();
+
+        for(var pair : fieldAndValue.entrySet()){
+            String oldValue = oldIter.next();
+            String newValue = newIter.next();
+            if(!oldValue.equals(newValue))
+                pair.setValue(newValue);
+        }
+
+        try(Statement statement = connection.createStatement()) {
+            String updateSQL = SQLCreator.getUpdateStatement(tableName, fieldAndValue, fieldAndValue.get("id"));
+            printGeneratedSQL(updateSQL);
+            int updRows = statement.executeUpdate(updateSQL);
+            printExecutedResult(updRows, "updated");
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Object read(String id) {
-        System.out.println(SQLCreator.getSelectStatement(tableName, "1"));
-        return null;
+        if(!isDBHaveMapping)
+            throw new RuntimeException("DB don't have mapping for this entity");
+
+        Object entityInstance;
+        try {
+            entityInstance = thisEntityClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        try(Statement statement = connection.createStatement()) {
+            String selectSQL = SQLCreator.getSelectStatement(tableName, id);
+            printGeneratedSQL(selectSQL);
+            ResultSet resultSet = statement.executeQuery(selectSQL);
+            EntityAnalyser.setFields(entityInstance, resultSet, fieldsNameAndType);
+            System.out.println(entityInstance);
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
+
+        return entityInstance;
     }
 
     @Override

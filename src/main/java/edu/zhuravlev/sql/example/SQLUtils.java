@@ -15,6 +15,9 @@ import java.util.function.Function;
 class SQLUtils {
     private SQLUtils(){};
     private static final Map<String, Method> dataTypesMapping;
+    private static final Map<String, Method> dataReadTypesMapping;
+
+    private static final Map<String, Class> typeAndClass;
 
     static {
         try {
@@ -22,6 +25,14 @@ class SQLUtils {
                     "int4", PreparedStatement.class.getMethod("setInt", int.class, int.class),
                     "text", PreparedStatement.class.getMethod("setString", int.class, String.class),
                     "varchar", PreparedStatement.class.getMethod("setString", int.class, String.class)
+            ));
+            dataReadTypesMapping = new HashMap<>(Map.of(
+                    "int", ResultSet.class.getMethod("getInt", int.class),
+                    "String", ResultSet.class.getMethod("getString", int.class)
+            ));
+            typeAndClass = new HashMap<>(Map.of(
+                    "int", int.class,
+                    "String", String.class
             ));
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -33,6 +44,14 @@ class SQLUtils {
             "text" , "String",
             "varchar" , "String"
     ));*/
+
+    public static Method getResultSetReadMethod(String expectedType) {
+        return dataReadTypesMapping.get(expectedType);
+    }
+
+    public static Class getClassByType(String type) {
+        return typeAndClass.get(type);
+    }
 
     public static final BiMap<String, String> typesSQLToJava = ImmutableBiMap.of(
             "int4", "int",

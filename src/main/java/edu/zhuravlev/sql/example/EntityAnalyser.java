@@ -2,6 +2,9 @@ package edu.zhuravlev.sql.example;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 class EntityAnalyser {
@@ -9,6 +12,10 @@ class EntityAnalyser {
 
     private static String getterName(String fieldName) {
         return "get" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
+    }
+
+    private static String setterName(String fieldName) {
+        return "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
     }
 
     public static String[] getFieldsName(Class entityClass) {
@@ -100,5 +107,31 @@ class EntityAnalyser {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Object setFields(Object o, ResultSet resultSet, Map<String, String> fieldsNameAndType) {
+        Objects.requireNonNull(o);
+        Objects.requireNonNull(resultSet);
+        Objects.requireNonNull(fieldsNameAndType);
+
+        try {
+            if(resultSet.next()) {
+                int counter = 1;
+                for(var pair : fieldsNameAndType.entrySet()) {
+                    Method rsMethod = SQLUtils.getResultSetReadMethod(pair.getValue());
+                    Object value = rsMethod.invoke(resultSet, counter);
+                    String setterName = setterName(pair.getKey());
+                    o.getClass().getMethod(setterName, SQLUtils.getClassByType(pair.getValue())).invoke(o, value);
+                    counter++;
+                }
+            }
+        } catch (SQLException e) {
+            SQLUtils.printSQLException(e);
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        return o;
     }
 }

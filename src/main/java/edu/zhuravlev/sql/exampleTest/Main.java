@@ -16,6 +16,8 @@ public class Main {
         Person person = new Person(1, "Nikolay", "zurik.n", "RU", "secret");
         Person person2 = new Person(2, "Sveta", "mathandmath", "RU", "secret");
         Person person3 = new Person(3, "John", "john.mail.eu", "EU", "secret");
+        Person person1_new = new Person(1, "Nikolay", "mail", "EU", "secret");
+        Person readPerson;
         EntityKeeper userKeeper = KeeperFactory.createEntityKeeper(Person.class, connection);
         System.out.println(userKeeper);
 
@@ -28,6 +30,12 @@ public class Main {
                     userKeeper.dropTable();
                 else if (input.equals("SaveAll"))
                     userKeeper.saveAll(Arrays.asList(person, person2, person3));
+                else if (input.equals("Read")) {
+                    readPerson = (Person)userKeeper.read("1");
+                    System.out.println(person.equals(readPerson));
+                }
+                else if (input.equals("Update"))
+                    userKeeper.update(person1_new);
                 else if (input.equals("1"))
                     break;
 
