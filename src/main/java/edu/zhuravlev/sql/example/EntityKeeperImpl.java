@@ -33,7 +33,9 @@ class EntityKeeperImpl implements EntityKeeper {
         try(Statement statement = connection.createStatement()) {
             String sqlStatement = SQLCreator.getCreateStatement(tableName, fieldsNameAndType);
             System.out.println("Generated SQL -----> " + sqlStatement);
-            return statement.executeUpdate(sqlStatement);
+            int upd = statement.executeUpdate(sqlStatement);
+            isDBHaveMapping = true;
+            return upd;
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
@@ -68,8 +70,38 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void save(List<Object> entityList) {
-        System.out.println(SQLCreator.getInsertStatement(tableName, fieldsNameAndType, new String[] {"2", "Sveta", "mathandmath", "RU", "secret"}));
+    public void saveAll(List<Object> entityList) {
+        for (var entity : entityList)
+            typeCheck(entity);
+
+        if(!isDBHaveMapping)
+            create();
+
+        int batchLimit = 20;
+        try(Statement statement = connection.createStatement()) {
+            int counter = 0;
+            String[] values;
+            String insertedSQL;
+            for (var entity : entityList) {
+                values = EntityAnalyser.getValues(entity, fieldsNameAndType);
+                insertedSQL = SQLCreator.getInsertStatement(tableName, fieldsNameAndType, values);
+                printGeneratedSQL(insertedSQL);
+                statement.addBatch(insertedSQL);
+                counter++;
+                if(counter==batchLimit) {
+                    int[] updRows = statement.executeBatch();
+                    printExecutedResult(updRows.length, "inserted");
+                    counter = 0;
+                }
+            }
+            if(counter != 0) {
+                int[] updRows = statement.executeBatch();
+                printExecutedResult(updRows.length, "inserted");
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -109,13 +141,53 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void delete(List<String> deletedEntities) {
+    public void deleteAll(List<Object> deletedEntities) {
+        for(var entity : deletedEntities)
+            typeCheck(entity);
 
+        if(!isDBHaveMapping)
+            throw new RuntimeException("DB don't have mapping for this entity");
+
+        int batchLimit = 20;
+        try(Statement statement = connection.createStatement()) {
+            int counter = 0;
+            String[] values;
+            String insertedSQL;
+            for (var entity : deletedEntities) {
+                String idValue = EntityAnalyser.getId(entity);
+                String deleteSQL = SQLCreator.getDeleteStatement(tableName, idValue);
+                printGeneratedSQL(deleteSQL);
+                statement.addBatch(deleteSQL);
+                counter++;
+                if(counter==batchLimit) {
+                    int[] updRows = statement.executeBatch();
+                    printExecutedResult(updRows.length, "deleted");
+                    counter = 0;
+                }
+            }
+            if(counter != 0) {
+                int[] updRows = statement.executeBatch();
+                printExecutedResult(updRows.length, "deleted");
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void dropTable() {
-        System.out.println(SQLCreator.getDropStatement(tableName));
+        try(Statement statement = connection.createStatement()) {
+            String dropSQL = SQLCreator.getDropStatement(tableName);
+            printGeneratedSQL(dropSQL);
+            statement.executeUpdate(dropSQL);
+            System.out.println("Drop " + tableName + " table");
+            isDBHaveMapping = false;
+            KeeperPool.removeMapping(thisEntityClass);
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

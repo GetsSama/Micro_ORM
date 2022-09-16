@@ -1,12 +1,13 @@
 package edu.zhuravlev.sql.example;
 
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface EntityKeeper {
     void save(Object entity);
 
-    void save(List<Object> entityList);
+    void saveAll(List<Object> entityList);
 
     void update(Object entity);
 
@@ -16,7 +17,7 @@ public interface EntityKeeper {
 
     void delete(Object entity);
 
-    void delete(List<String> deletedEntities);
+    void deleteAll(List<Object> deletedEntities);
 
     void dropTable();
 }

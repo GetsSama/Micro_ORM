@@ -5,6 +5,7 @@ import edu.zhuravlev.sql.example.EntityKeeper;
 import edu.zhuravlev.sql.example.KeeperFactory;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -21,14 +22,15 @@ public class Main {
         try (Scanner scn = new Scanner(System.in)){
             while (scn.hasNext()) {
                 String input = scn.next();
-                if (input.equals("Nikolay"))
-                    userKeeper.save(person);
-                else if (input.equals("Sveta"))
-                    userKeeper.save(person2);
-                else if (input.equals("John"))
-                    userKeeper.save(person3);
+                if (input.equals("List"))
+                    userKeeper.deleteAll(Arrays.asList(person, person2, person3));
+                else if (input.equals("Drop"))
+                    userKeeper.dropTable();
+                else if (input.equals("SaveAll"))
+                    userKeeper.saveAll(Arrays.asList(person, person2, person3));
                 else if (input.equals("1"))
                     break;
+
             }
         }
 
