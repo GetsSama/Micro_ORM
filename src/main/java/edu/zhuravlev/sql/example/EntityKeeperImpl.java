@@ -113,7 +113,7 @@ class EntityKeeperImpl implements EntityKeeper {
             throw new RuntimeException("DB don't have mapping for this entity");
 
         List<String> valuesEntity = Arrays.asList(EntityAnalyser.getValues(entity, fieldsNameAndType));
-        Map<String, String> fieldAndValue = new HashMap<>();
+        Map<String, String> fieldAndValue = new LinkedHashMap<>();
         Iterator<String> valIter = valuesEntity.iterator();
 
         for(var field : fieldsNameAndType.keySet())
@@ -151,13 +151,7 @@ class EntityKeeperImpl implements EntityKeeper {
         Object entityInstance;
         try {
             entityInstance = thisEntityClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 
@@ -165,8 +159,10 @@ class EntityKeeperImpl implements EntityKeeper {
             String selectSQL = SQLCreator.getSelectStatement(tableName, id);
             printGeneratedSQL(selectSQL);
             ResultSet resultSet = statement.executeQuery(selectSQL);
-            EntityAnalyser.setFields(entityInstance, resultSet, fieldsNameAndType);
-            System.out.println(entityInstance);
+
+            if(resultSet.next())
+                EntityAnalyser.setFields(entityInstance, resultSet, fieldsNameAndType);
+
         } catch (SQLException e) {
             printSQLException(e);
             throw new RuntimeException(e);
@@ -177,7 +173,33 @@ class EntityKeeperImpl implements EntityKeeper {
 
     @Override
     public List<Object> readAll() {
-        return null;
+        if(!isDBHaveMapping)
+            throw new RuntimeException("DB don't have mapping for this entity");
+
+        Object entityInstance;
+        List<Object> entitiesAll = new LinkedList<>();
+
+        try(Statement statement = connection.createStatement()) {
+            String readAllSQL = "SELECT * FROM " + tableName;
+            printGeneratedSQL(readAllSQL);
+            ResultSet resultSet = statement.executeQuery(readAllSQL);
+
+            while (resultSet.next()) {
+                try {
+                    entityInstance = thisEntityClass.getDeclaredConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+                EntityAnalyser.setFields(entityInstance, resultSet, fieldsNameAndType);
+                entitiesAll.add(entityInstance);
+            }
+
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw new RuntimeException(e);
+        }
+
+        return entitiesAll;
     }
 
     @Override

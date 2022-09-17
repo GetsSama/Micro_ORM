@@ -6,6 +6,7 @@ import edu.zhuravlev.sql.example.KeeperFactory;
 
 import java.sql.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -24,7 +25,7 @@ public class Main {
         try (Scanner scn = new Scanner(System.in)){
             while (scn.hasNext()) {
                 String input = scn.next();
-                if (input.equals("List"))
+                if (input.equals("DeleteAll"))
                     userKeeper.deleteAll(Arrays.asList(person, person2, person3));
                 else if (input.equals("Drop"))
                     userKeeper.dropTable();
@@ -36,6 +37,11 @@ public class Main {
                 }
                 else if (input.equals("Update"))
                     userKeeper.update(person1_new);
+                else if (input.equals("ReadAll")) {
+                    List<Object> persons = userKeeper.readAll();
+                    persons.stream().forEach(System.out::println);
+                    System.out.println(persons.equals(Arrays.asList(person, person2, person3)));
+                }
                 else if (input.equals("1"))
                     break;
 

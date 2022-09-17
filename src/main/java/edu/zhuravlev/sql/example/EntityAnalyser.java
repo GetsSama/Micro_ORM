@@ -115,19 +115,14 @@ class EntityAnalyser {
         Objects.requireNonNull(fieldsNameAndType);
 
         try {
-            if(resultSet.next()) {
-                int counter = 1;
-                for(var pair : fieldsNameAndType.entrySet()) {
-                    Method rsMethod = SQLUtils.getResultSetReadMethod(pair.getValue());
-                    Object value = rsMethod.invoke(resultSet, counter);
-                    String setterName = setterName(pair.getKey());
-                    o.getClass().getMethod(setterName, SQLUtils.getClassByType(pair.getValue())).invoke(o, value);
-                    counter++;
-                }
+            int counter = 1;
+            for(var pair : fieldsNameAndType.entrySet()) {
+                Method rsMethod = SQLUtils.getResultSetReadMethod(pair.getValue());
+                Object value = rsMethod.invoke(resultSet, counter);
+                String setterName = setterName(pair.getKey());
+                o.getClass().getMethod(setterName, SQLUtils.getClassByType(pair.getValue())).invoke(o, value);
+                counter++;
             }
-        } catch (SQLException e) {
-            SQLUtils.printSQLException(e);
-            throw new RuntimeException(e);
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

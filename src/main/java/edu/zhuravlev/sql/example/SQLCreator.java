@@ -71,14 +71,14 @@ class SQLCreator {
 
         for (var pair : updatableFieldAndValue.entrySet()) {
             if (counter != size)
-                builder.append(pair.getKey() + "=" + pair.getValue() + ", ");
+                builder.append(pair.getKey() + "='" + pair.getValue() + "', ");
             else
-                builder.append(pair.getKey() + "=" + pair.getValue() + " ");
+                builder.append(pair.getKey() + "='" + pair.getValue() + "' ");
 
             counter++;
         }
 
-        builder.append("WHERE id=" + id);
+        builder.append("WHERE id='" + id + "'");
 
         return builder.toString();
     }
