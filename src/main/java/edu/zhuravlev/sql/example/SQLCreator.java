@@ -38,7 +38,7 @@ class SQLCreator {
 
     public static String getSelectStatement(String tableName, String id) {
         String firstPart = "SELECT * FROM " + tableName;
-        String secondPart = " WHERE id=" + id;
+        String secondPart = " WHERE id='" + id + "'";
         return firstPart + secondPart;
     }
 
@@ -84,7 +84,7 @@ class SQLCreator {
     }
 
     public static String getDeleteStatement(String tableName, String id) {
-        String firstPart = "DELETE FROM %s WHERE id=%s";
+        String firstPart = "DELETE FROM %s WHERE id='%s'";
         return String.format(firstPart, tableName, id);
     }
 

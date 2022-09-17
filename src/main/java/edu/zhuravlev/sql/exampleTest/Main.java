@@ -48,6 +48,22 @@ public class Main {
             }
         }
 
+        EntityKeeper carsKeeper = KeeperFactory.createEntityKeeper(Car.class, connection);
+        System.out.println(carsKeeper);
+        Car car1 = new Car("Nikolay", "Nissan GTR", 330, 550);
+        Car car2 = new Car("Sveta", "RangeRover", 250, 400);
+        Car car3 = new Car("John", "Opel", 250, 150);
+
+        carsKeeper.saveAll(Arrays.asList(car1, car2));
+        carsKeeper.save(car3);
+        System.out.println(carsKeeper.readAll());
+        car1.setModel("Nissan GTR R35");
+        carsKeeper.update(car1);
+        System.out.println(carsKeeper.readAll());
+        carsKeeper.delete(car3);
+        System.out.println(carsKeeper.readAll());
+        //carsKeeper.dropTable();
+
         ConnectionManager.close();
     }
 }
