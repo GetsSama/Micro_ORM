@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 class EntityAnalyser {
@@ -18,7 +17,7 @@ class EntityAnalyser {
         return "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
     }
 
-    public static String[] getFieldsName(Class entityClass) {
+    public static String[] getFieldsName(Class<?> entityClass) {
         Objects.requireNonNull(entityClass);
         String[] names;
         Field[] fields = {};
@@ -36,7 +35,7 @@ class EntityAnalyser {
         }
     }
 
-    public static String[] getFieldsType(Class entityClass) {
+    public static String[] getFieldsType(Class<?> entityClass) {
         Objects.requireNonNull(entityClass);
         String[] types;
         Field[] fields = {};
@@ -54,7 +53,7 @@ class EntityAnalyser {
         }
     }
 
-    public static Map<String, String> getFieldsNameAndType(Class entityClass){
+    public static Map<String, String> getFieldsNameAndType(Class<?> entityClass){
         Objects.requireNonNull(entityClass);
 
         Field[] fields = {};
@@ -83,11 +82,7 @@ class EntityAnalyser {
             try {
                 Object value = o.getClass().getMethod(methodName).invoke(o);
                 values[counter] = value.toString();
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
             counter++;
@@ -100,16 +95,12 @@ class EntityAnalyser {
         try {
             Object value = o.getClass().getMethod("getId").invoke(o);
             return value.toString();
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Object setFields(Object o, ResultSet resultSet, Map<String, String> fieldsNameAndType) {
+    public static void setFields(Object o, ResultSet resultSet, Map<String, String> fieldsNameAndType) {
         Objects.requireNonNull(o);
         Objects.requireNonNull(resultSet);
         Objects.requireNonNull(fieldsNameAndType);
@@ -126,7 +117,5 @@ class EntityAnalyser {
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-
-        return o;
     }
 }

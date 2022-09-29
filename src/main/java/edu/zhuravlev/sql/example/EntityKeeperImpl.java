@@ -9,16 +9,16 @@ import java.util.*;
 
 import static edu.zhuravlev.sql.example.SQLUtils.*;
 
-class EntityKeeperImpl implements EntityKeeper {
+class EntityKeeperImpl<T> implements EntityKeeper<T> {
 
     private final Map<String, String> fieldsNameAndType;
     private final Connection connection;
     private final String tableName;
-    private final Class thisEntityClass;
+    private final Class<T> thisEntityClass;
     private boolean isDBHaveMapping;
 
 
-    public EntityKeeperImpl(Class entityClass, Map<String, String> fieldsNameAndType, Connection connection, String tableName) {
+    public EntityKeeperImpl (Class<T> entityClass, Map<String, String> fieldsNameAndType, Connection connection, String tableName) {
         Objects.requireNonNull(fieldsNameAndType);
         Objects.requireNonNull(connection);
         Objects.requireNonNull(tableName);
@@ -52,9 +52,8 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void save(Object entity) {
-        typeCheck(entity);
-
+    public void save(T entity) {
+        //typeCheck(entity);
         if (!isDBHaveMapping)
             create();
 
@@ -72,9 +71,9 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void saveAll(List<Object> entityList) {
-        for (var entity : entityList)
-            typeCheck(entity);
+    public void saveAll(List<T> entityList) {
+       /* for (var entity : entityList)
+            typeCheck(entity);*/
 
         if(!isDBHaveMapping)
             create();
@@ -107,8 +106,8 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void update(Object entity) {
-        typeCheck(entity);
+    public void update(T entity) {
+        //typeCheck(entity);
         if(!isDBHaveMapping)
             throw new RuntimeException("DB don't have mapping for this entity");
 
@@ -120,7 +119,7 @@ class EntityKeeperImpl implements EntityKeeper {
             fieldAndValue.put(field, valIter.next());
 
 
-        Object equivalentEntity = read(fieldAndValue.get("id"));
+        T equivalentEntity = read(fieldAndValue.get("id"));
         List<String> valuesEntityInDB = Arrays.asList(EntityAnalyser.getValues(equivalentEntity, fieldsNameAndType));
         Iterator<String> oldIter = valuesEntityInDB.iterator();
         Iterator<String> newIter = valuesEntity.iterator();
@@ -144,11 +143,11 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public Object read(String id) {
+    public T read(String id) {
         if(!isDBHaveMapping)
             throw new RuntimeException("DB don't have mapping for this entity");
 
-        Object entityInstance;
+        T entityInstance;
         try {
             entityInstance = thisEntityClass.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -172,12 +171,12 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public List<Object> readAll() {
+    public List<T> readAll() {
         if(!isDBHaveMapping)
             throw new RuntimeException("DB don't have mapping for this entity");
 
-        Object entityInstance;
-        List<Object> entitiesAll = new LinkedList<>();
+        T entityInstance;
+        List<T> entitiesAll = new LinkedList<>();
 
         try(Statement statement = connection.createStatement()) {
             String readAllSQL = "SELECT * FROM " + tableName;
@@ -203,8 +202,8 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void delete(Object entity) {
-        typeCheck(entity);
+    public void delete(T entity) {
+        //typeCheck(entity);
         if(!isDBHaveMapping)
             throw new RuntimeException("DB don't have mapping for this entity");
 
@@ -222,9 +221,9 @@ class EntityKeeperImpl implements EntityKeeper {
     }
 
     @Override
-    public void deleteAll(List<Object> deletedEntities) {
-        for(var entity : deletedEntities)
-            typeCheck(entity);
+    public void deleteAll(List<T> deletedEntities) {
+        /*for(var entity : deletedEntities)
+            typeCheck(entity);*/
 
         if(!isDBHaveMapping)
             throw new RuntimeException("DB don't have mapping for this entity");

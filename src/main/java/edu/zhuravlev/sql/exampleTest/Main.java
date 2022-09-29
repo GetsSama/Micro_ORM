@@ -19,7 +19,7 @@ public class Main {
         Person person3 = new Person(3, "John", "john.mail.eu", "EU", "secret");
         Person person1_new = new Person(1, "Nikolay", "mail", "EU", "secret");
         Person readPerson;
-        EntityKeeper userKeeper = KeeperFactory.createEntityKeeper(Person.class, connection);
+        EntityKeeper<Person> userKeeper = KeeperFactory.createEntityKeeper(Person.class, connection);
         System.out.println(userKeeper);
 
         try (Scanner scn = new Scanner(System.in)){
@@ -32,13 +32,13 @@ public class Main {
                 else if (input.equals("SaveAll"))
                     userKeeper.saveAll(Arrays.asList(person, person2, person3));
                 else if (input.equals("Read")) {
-                    readPerson = (Person)userKeeper.read("1");
+                    readPerson = userKeeper.read("1");
                     System.out.println(person.equals(readPerson));
                 }
                 else if (input.equals("Update"))
                     userKeeper.update(person1_new);
                 else if (input.equals("ReadAll")) {
-                    List<Object> persons = userKeeper.readAll();
+                    List<Person> persons = userKeeper.readAll();
                     persons.stream().forEach(System.out::println);
                     System.out.println(persons.equals(Arrays.asList(person, person2, person3)));
                 }
@@ -48,7 +48,7 @@ public class Main {
             }
         }
 
-        EntityKeeper carsKeeper = KeeperFactory.createEntityKeeper(Car.class, connection);
+        EntityKeeper<Car> carsKeeper = KeeperFactory.createEntityKeeper(Car.class, connection);
         System.out.println(carsKeeper);
         Car car1 = new Car("Nikolay", "Nissan GTR", 330, 550);
         Car car2 = new Car("Sveta", "RangeRover", 250, 400);

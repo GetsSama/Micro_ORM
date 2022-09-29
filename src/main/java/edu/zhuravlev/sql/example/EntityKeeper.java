@@ -1,23 +1,22 @@
 package edu.zhuravlev.sql.example;
 
 
-import java.sql.SQLException;
 import java.util.List;
 
-public interface EntityKeeper {
-    void save(Object entity);
+public interface EntityKeeper<T> {
+    void save(T entity);
 
-    void saveAll(List<Object> entityList);
+    void saveAll(List<T> entityList);
 
-    void update(Object entity);
+    void update(T entity);
 
-    Object read(String id);
+    T read(String id);
 
-    List<Object> readAll();
+    List<T> readAll();
 
-    void delete(Object entity);
+    void delete(T entity);
 
-    void deleteAll(List<Object> deletedEntities);
+    void deleteAll(List<T> deletedEntities);
 
     void dropTable();
 }
