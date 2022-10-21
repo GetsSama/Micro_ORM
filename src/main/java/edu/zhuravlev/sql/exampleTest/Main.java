@@ -1,8 +1,8 @@
 package edu.zhuravlev.sql.exampleTest;
 
-import edu.zhuravlev.sql.example.TmpConnectionRealization;
+import edu.zhuravlev.sql.example.ConnectionManager;
 import edu.zhuravlev.sql.example.EntityKeeper;
-import edu.zhuravlev.sql.example.EntityKeeperWrapper;
+import edu.zhuravlev.sql.example.KeeperFactory;
 
 import java.sql.*;
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Connection connection = TmpConnectionRealization.getConnection();
+        Connection connection = ConnectionManager.getConnection();
 
 
         Person person = new Person(1, "Nikolay", "zurik.n", "RU", "secret");
@@ -19,7 +19,7 @@ public class Main {
         Person person3 = new Person(3, "John", "john.mail.eu", "EU", "secret");
         Person person1_new = new Person(1, "Nikolay", "mail", "EU", "secret");
         Person readPerson;
-        EntityKeeper<Person> userKeeper = EntityKeeperWrapper.createEntityKeeper(Person.class, connection);
+        EntityKeeper<Person> userKeeper = KeeperFactory.createEntityKeeper(Person.class, connection);
         System.out.println(userKeeper);
 
         try (Scanner scn = new Scanner(System.in)){
@@ -39,7 +39,7 @@ public class Main {
                     userKeeper.update(person1_new);
                 else if (input.equals("ReadAll")) {
                     List<Person> persons = userKeeper.readAll();
-                    persons.forEach(System.out::println);
+                    persons.stream().forEach(System.out::println);
                     System.out.println(persons.equals(Arrays.asList(person, person2, person3)));
                 }
                 else if (input.equals("1"))
@@ -48,7 +48,7 @@ public class Main {
             }
         }
 
-        EntityKeeper<Car> carsKeeper = EntityKeeperWrapper.createEntityKeeper(Car.class, connection);
+        EntityKeeper<Car> carsKeeper = KeeperFactory.createEntityKeeper(Car.class, connection);
         System.out.println(carsKeeper);
         Car car1 = new Car("Nikolay", "Nissan GTR", 330, 550);
         Car car2 = new Car("Sveta", "RangeRover", 250, 400);
@@ -64,6 +64,6 @@ public class Main {
         System.out.println(carsKeeper.readAll());
         //carsKeeper.dropTable();
 
-        TmpConnectionRealization.close();
+        ConnectionManager.close();
     }
 }
