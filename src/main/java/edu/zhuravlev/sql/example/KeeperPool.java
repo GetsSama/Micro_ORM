@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-class KeeperPool {
+public class KeeperPool {
     private static final Map<Class<?>,EntityKeeper<?>> entityMapping = new HashMap<>();
 
     private KeeperPool(){};
