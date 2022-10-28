@@ -9,34 +9,16 @@ import java.util.*;
 
 import static edu.zhuravlev.sql.example.SQLUtils.*;
 
-class EntityKeeperImpl<T> implements EntityKeeper<T> {
+class SimpleEntityKeeperImpl implements EntityKeeper {
 
-    private final Map<String, String> fieldsNameAndType;
-    private final Connection connection;
-    private final String tableName;
-    private final Class<T> thisEntityClass;
-    private boolean isDBHaveMapping;
+    private SimpleEntityKeeperImpl(){};
 
-
-    public EntityKeeperImpl (Class<T> entityClass, Map<String, String> fieldsNameAndType, Connection connection, String tableName) {
-        Objects.requireNonNull(fieldsNameAndType);
-        Objects.requireNonNull(connection);
-        Objects.requireNonNull(tableName);
-
-        this.fieldsNameAndType = fieldsNameAndType;
-        this.connection = connection;
-        this.tableName = tableName;
-
-        thisEntityClass = entityClass;
-        isDBHaveMapping = SQLUtils.isDBContainsMapping(connection,thisEntityClass);
-    }
-
-    private int create() {
+    private int create(EntityMetaData entityData, Connection connection) {
         try(Statement statement = connection.createStatement()) {
-            String sqlStatement = SQLCreator.getCreateStatement(tableName, fieldsNameAndType);
+            String sqlStatement = SQLCreator.getCreateStatement(entityData.getTableName(), entityData.getFieldsNameAndType());
             System.out.println("Generated SQL -----> " + sqlStatement);
             int upd = statement.executeUpdate(sqlStatement);
-            isDBHaveMapping = true;
+            entityData.tableCreated();
             return upd;
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
@@ -44,21 +26,22 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
         }
     }
 
-    private void typeCheck(Object o) {
-        Objects.requireNonNull(o);
-        Class objClass = o.getClass();
-        if(!Objects.equals(objClass, thisEntityClass))
-            throw new RuntimeException("Uncorrected entity object type!");
-    }
+    //Old method, uses when app was without generics
+//    private void typeCheck(Object o) {
+//        Objects.requireNonNull(o);
+//        Class<?> objClass = o.getClass();
+//        if(!Objects.equals(objClass, thisEntityClass))
+//            throw new RuntimeException("Uncorrected entity object type!");
+//    }
 
     @Override
-    public void save(T entity) {
+    public void save(Object entity, EntityMetaData entityData, Connection connection) {
         //typeCheck(entity);
-        if (!isDBHaveMapping)
-            create();
+        if (!entityData.isTableExist())
+            create(entityData, connection);
 
-        String[] values = EntityAnalyser.getValues(entity, fieldsNameAndType);
-        String insertSQL = SQLCreator.getInsertStatement(tableName, fieldsNameAndType, values);
+        String[] values = EntityAnalyser.getValues(entity, entityData.getFieldsNameAndType());
+        String insertSQL = SQLCreator.getInsertStatement(entityData.getTableName(), entityData.getFieldsNameAndType(), values);
         printGeneratedSQL(insertSQL);
 
         try (Statement statement = connection.createStatement()) {
@@ -71,12 +54,12 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public void saveAll(List<T> entityList) {
+    public void saveAll(List<Object> entityList, EntityMetaData entityData, Connection connection) {
        /* for (var entity : entityList)
             typeCheck(entity);*/
 
-        if(!isDBHaveMapping)
-            create();
+        if(!entityData.isTableExist())
+            create(entityData, connection);
 
         int batchLimit = 20;
         try(Statement statement = connection.createStatement()) {
@@ -84,8 +67,8 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
             String[] values;
             String insertedSQL;
             for (var entity : entityList) {
-                values = EntityAnalyser.getValues(entity, fieldsNameAndType);
-                insertedSQL = SQLCreator.getInsertStatement(tableName, fieldsNameAndType, values);
+                values = EntityAnalyser.getValues(entity, entityData.getFieldsNameAndType());
+                insertedSQL = SQLCreator.getInsertStatement(entityData.getTableName(), entityData.getFieldsNameAndType(), values);
                 printGeneratedSQL(insertedSQL);
                 statement.addBatch(insertedSQL);
                 counter++;
@@ -106,21 +89,21 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public void update(T entity) {
+    public void update(Object entity, EntityMetaData entityData, Connection connection) {
         //typeCheck(entity);
-        if(!isDBHaveMapping)
+        if(!entityData.isTableExist())
             throw new RuntimeException("DB don't have mapping for this entity");
 
-        List<String> valuesEntity = Arrays.asList(EntityAnalyser.getValues(entity, fieldsNameAndType));
+        List<String> valuesEntity = Arrays.asList(EntityAnalyser.getValues(entity, entityData.getFieldsNameAndType()));
         Map<String, String> fieldAndValue = new LinkedHashMap<>();
         Iterator<String> valIter = valuesEntity.iterator();
 
-        for(var field : fieldsNameAndType.keySet())
+        for(var field : entityData.getFieldsNameAndType().keySet())
             fieldAndValue.put(field, valIter.next());
 
 
-        T equivalentEntity = read(fieldAndValue.get("id"));
-        List<String> valuesEntityInDB = Arrays.asList(EntityAnalyser.getValues(equivalentEntity, fieldsNameAndType));
+        Object equivalentEntity = read(fieldAndValue.get(entityData.getIdFieldName()), entityData, connection);
+        List<String> valuesEntityInDB = Arrays.asList(EntityAnalyser.getValues(equivalentEntity, entityData.getFieldsNameAndType()));
         Iterator<String> oldIter = valuesEntityInDB.iterator();
         Iterator<String> newIter = valuesEntity.iterator();
 
@@ -132,7 +115,7 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
         }
 
         try(Statement statement = connection.createStatement()) {
-            String updateSQL = SQLCreator.getUpdateStatement(tableName, fieldAndValue, fieldAndValue.get("id"));
+            String updateSQL = SQLCreator.getUpdateStatement(entityData.getTableName(), fieldAndValue, fieldAndValue.get(entityData.getIdFieldName()));
             printGeneratedSQL(updateSQL);
             int updRows = statement.executeUpdate(updateSQL);
             printExecutedResult(updRows, "updated");
@@ -143,24 +126,24 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public T read(String id) {
-        if(!isDBHaveMapping)
+    public Object read(String id, EntityMetaData entityData, Connection connection) {
+        if(!entityData.isTableExist())
             throw new RuntimeException("DB don't have mapping for this entity");
 
-        T entityInstance;
+        Object entityInstance;
         try {
-            entityInstance = thisEntityClass.getDeclaredConstructor().newInstance();
+            entityInstance = entityData.getEntityClass().getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 
         try(Statement statement = connection.createStatement()) {
-            String selectSQL = SQLCreator.getSelectStatement(tableName, id);
+            String selectSQL = SQLCreator.getSelectStatement(entityData.getTableName(), id);
             printGeneratedSQL(selectSQL);
             ResultSet resultSet = statement.executeQuery(selectSQL);
 
             if(resultSet.next())
-                EntityAnalyser.setFields(entityInstance, resultSet, fieldsNameAndType);
+                EntityAnalyser.setFields(entityInstance, resultSet, entityData.getFieldsNameAndType());
 
         } catch (SQLException e) {
             printSQLException(e);
@@ -171,25 +154,25 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public List<T> readAll() {
-        if(!isDBHaveMapping)
+    public List<Object> readAll(EntityMetaData entityData, Connection connection) {
+        if(!entityData.isTableExist())
             throw new RuntimeException("DB don't have mapping for this entity");
 
-        T entityInstance;
-        List<T> entitiesAll = new LinkedList<>();
+        Object entityInstance;
+        List<Object> entitiesAll = new LinkedList<>();
 
         try(Statement statement = connection.createStatement()) {
-            String readAllSQL = "SELECT * FROM " + tableName;
+            String readAllSQL = "SELECT * FROM " + entityData.getTableName();
             printGeneratedSQL(readAllSQL);
             ResultSet resultSet = statement.executeQuery(readAllSQL);
 
             while (resultSet.next()) {
                 try {
-                    entityInstance = thisEntityClass.getDeclaredConstructor().newInstance();
+                    entityInstance = entityData.getEntityClass().getDeclaredConstructor().newInstance();
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
-                EntityAnalyser.setFields(entityInstance, resultSet, fieldsNameAndType);
+                EntityAnalyser.setFields(entityInstance, resultSet, entityData.getFieldsNameAndType());
                 entitiesAll.add(entityInstance);
             }
 
@@ -202,13 +185,13 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public void delete(T entity) {
+    public void delete(Object entity, EntityMetaData entityData, Connection connection) {
         //typeCheck(entity);
-        if(!isDBHaveMapping)
+        if(!entityData.isTableExist())
             throw new RuntimeException("DB don't have mapping for this entity");
 
-        String idValue = EntityAnalyser.getId(entity);
-        String deleteSQL = SQLCreator.getDeleteStatement(tableName, idValue);
+        String idValue = EntityAnalyser.getId(entity, entityData.getIdFieldName());
+        String deleteSQL = SQLCreator.getDeleteStatement(entityData.getTableName(), idValue);
         printGeneratedSQL(deleteSQL);
 
         try(Statement statement = connection.createStatement()) {
@@ -221,11 +204,11 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public void deleteAll(List<T> deletedEntities) {
+    public void deleteAll(List<Object> deletedEntities, EntityMetaData entityData, Connection connection) {
         /*for(var entity : deletedEntities)
             typeCheck(entity);*/
 
-        if(!isDBHaveMapping)
+        if(!entityData.isTableExist())
             throw new RuntimeException("DB don't have mapping for this entity");
 
         int batchLimit = 20;
@@ -234,8 +217,8 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
             String[] values;
             String insertedSQL;
             for (var entity : deletedEntities) {
-                String idValue = EntityAnalyser.getId(entity);
-                String deleteSQL = SQLCreator.getDeleteStatement(tableName, idValue);
+                String idValue = EntityAnalyser.getId(entity, entityData.getIdFieldName());
+                String deleteSQL = SQLCreator.getDeleteStatement(entityData.getTableName(), idValue);
                 printGeneratedSQL(deleteSQL);
                 statement.addBatch(deleteSQL);
                 counter++;
@@ -256,26 +239,17 @@ class EntityKeeperImpl<T> implements EntityKeeper<T> {
     }
 
     @Override
-    public void dropTable() {
+    public void dropTable(EntityMetaData entityData, Connection connection) {
         try(Statement statement = connection.createStatement()) {
-            String dropSQL = SQLCreator.getDropStatement(tableName);
+            String dropSQL = SQLCreator.getDropStatement(entityData.getTableName());
             printGeneratedSQL(dropSQL);
             statement.executeUpdate(dropSQL);
-            System.out.println("Drop " + tableName + " table");
-            isDBHaveMapping = false;
-            KeeperPool.removeMapping(thisEntityClass);
+            System.out.println("Drop " + entityData.getTableName() + " table");
+            entityData.tableDropped();
+            //KeeperPool.removeMapping(thisEntityClass);
         } catch (SQLException e) {
             printSQLException(e);
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "EntityKeeperImpl{" +
-                "fieldsNameAndType=" + fieldsNameAndType +
-                ", tableName='" + tableName + '\'' +
-                ", thisEntityClass=" + thisEntityClass +
-                '}';
     }
 }

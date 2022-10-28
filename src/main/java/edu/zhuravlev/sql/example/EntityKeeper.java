@@ -1,22 +1,23 @@
 package edu.zhuravlev.sql.example;
 
 
+import java.sql.Connection;
 import java.util.List;
 
-public interface EntityKeeper<T> {
-    void save(T entity);
+public interface EntityKeeper {
+    void save(Object entity, EntityMetaData entityData, Connection connection);
 
-    void saveAll(List<T> entityList);
+    void saveAll(List<Object> entityList, EntityMetaData entityData, Connection connection);
 
-    void update(T entity);
+    void update(Object entity, EntityMetaData entityData, Connection connection);
 
-    T read(String id);
+    Object read(String id, EntityMetaData entityData, Connection connection);
 
-    List<T> readAll();
+    List<Object> readAll(EntityMetaData entityData, Connection connection);
 
-    void delete(T entity);
+    void delete(Object entity, EntityMetaData entityData, Connection connection);
 
-    void deleteAll(List<T> deletedEntities);
+    void deleteAll(List<Object> deletedEntities, EntityMetaData entityData, Connection connection);
 
-    void dropTable();
+    void dropTable(EntityMetaData entityData, Connection connection);
 }

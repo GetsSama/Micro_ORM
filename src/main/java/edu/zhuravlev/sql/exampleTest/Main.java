@@ -39,7 +39,7 @@ public class Main {
                     userKeeper.update(person1_new);
                 else if (input.equals("ReadAll")) {
                     List<Person> persons = userKeeper.readAll();
-                    persons.stream().forEach(System.out::println);
+                    persons.forEach(System.out::println);
                     System.out.println(persons.equals(Arrays.asList(person, person2, person3)));
                 }
                 else if (input.equals("1"))

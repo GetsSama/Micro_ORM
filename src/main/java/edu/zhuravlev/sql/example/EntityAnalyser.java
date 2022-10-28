@@ -56,8 +56,7 @@ class EntityAnalyser {
     public static Map<String, String> getFieldsNameAndType(Class<?> entityClass){
         Objects.requireNonNull(entityClass);
 
-        Field[] fields = {};
-        fields = entityClass.getDeclaredFields();
+        Field[] fields = entityClass.getDeclaredFields();
 
         if (fields.length != 0) {
             Map<String, String> nameAndType = new LinkedHashMap<>((int) (fields.length/0.8));
@@ -90,10 +89,10 @@ class EntityAnalyser {
         return values;
     }
 
-    public static String getId(Object o) {
+    public static String getId(Object o, String idName) {
         Objects.requireNonNull(o);
         try {
-            Object value = o.getClass().getMethod("getId").invoke(o);
+            Object value = o.getClass().getMethod(idName).invoke(o);
             return value.toString();
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);

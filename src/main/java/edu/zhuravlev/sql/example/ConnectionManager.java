@@ -1,5 +1,11 @@
 package edu.zhuravlev.sql.example;
 
+import org.postgresql.ds.PGConnectionPoolDataSource;
+import org.postgresql.ds.PGPooledConnection;
+import org.postgresql.jdbc2.optional.ConnectionPool;
+
+import javax.sql.DataSource;
+import javax.sql.PooledConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
