@@ -11,7 +11,13 @@ import static edu.zhuravlev.sql.example.SQLUtils.*;
 
 class SimpleEntityKeeperImpl implements EntityKeeper {
 
+    private static SimpleEntityKeeperImpl thisInstance;
     private SimpleEntityKeeperImpl(){};
+    public static SimpleEntityKeeperImpl create() {
+        if (thisInstance == null)
+            thisInstance = new SimpleEntityKeeperImpl();
+        return thisInstance;
+    }
 
     private int create(EntityMetaData entityData, Connection connection) {
         try(Statement statement = connection.createStatement()) {

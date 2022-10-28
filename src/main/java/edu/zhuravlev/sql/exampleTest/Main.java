@@ -2,7 +2,7 @@ package edu.zhuravlev.sql.exampleTest;
 
 import edu.zhuravlev.sql.example.ConnectionManager;
 import edu.zhuravlev.sql.example.EntityKeeper;
-import edu.zhuravlev.sql.example.KeeperFactory;
+import edu.zhuravlev.sql.example.EntityKeeperWrapper;
 
 import java.sql.*;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ public class Main {
         Person person3 = new Person(3, "John", "john.mail.eu", "EU", "secret");
         Person person1_new = new Person(1, "Nikolay", "mail", "EU", "secret");
         Person readPerson;
-        EntityKeeper<Person> userKeeper = KeeperFactory.createEntityKeeper(Person.class, connection);
+        EntityKeeper<Person> userKeeper = EntityKeeperWrapper.createEntityKeeper(Person.class, connection);
         System.out.println(userKeeper);
 
         try (Scanner scn = new Scanner(System.in)){
@@ -48,7 +48,7 @@ public class Main {
             }
         }
 
-        EntityKeeper<Car> carsKeeper = KeeperFactory.createEntityKeeper(Car.class, connection);
+        EntityKeeper<Car> carsKeeper = EntityKeeperWrapper.createEntityKeeper(Car.class, connection);
         System.out.println(carsKeeper);
         Car car1 = new Car("Nikolay", "Nissan GTR", 330, 550);
         Car car2 = new Car("Sveta", "RangeRover", 250, 400);
