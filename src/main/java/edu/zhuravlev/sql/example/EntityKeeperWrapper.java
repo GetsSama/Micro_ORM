@@ -14,9 +14,12 @@ public class EntityKeeperWrapper implements EntityKeeper {
         return thisInstance;
     }
 
+    //---------------------------------------------------------------------------------------------------
     // It is hardcode realization for "suitableImpl" method.
     // A more functional and flexible implementation is needed in the future.
-    private EntityKeeper suitableImpl(EntityMetaData entityData){return SimpleEntityKeeperImpl.create();};
+    private EntityKeeper suitableImpl(EntityMetaData entityData){return SimpleEntityKeeperImpl.create();}
+    //---------------------------------------------------------------------------------------------------
+
     @Override
     public void save(Object entity, EntityMetaData entityData, Connection connection) {
         suitableImpl(entityData).save(entity, entityData, connection);

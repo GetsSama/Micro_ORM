@@ -1,6 +1,6 @@
 package edu.zhuravlev.sql.exampleTest;
 
-import edu.zhuravlev.sql.example.ConnectionManager;
+import edu.zhuravlev.sql.example.TmpConnectionRealization;
 import edu.zhuravlev.sql.example.EntityKeeper;
 import edu.zhuravlev.sql.example.EntityKeeperWrapper;
 
@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = TmpConnectionRealization.getConnection();
 
 
         Person person = new Person(1, "Nikolay", "zurik.n", "RU", "secret");
@@ -64,6 +64,6 @@ public class Main {
         System.out.println(carsKeeper.readAll());
         //carsKeeper.dropTable();
 
-        ConnectionManager.close();
+        TmpConnectionRealization.close();
     }
 }
