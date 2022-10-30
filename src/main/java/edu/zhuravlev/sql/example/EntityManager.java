@@ -1,22 +1,55 @@
 package edu.zhuravlev.sql.example;
 
-import java.sql.Connection;
 import java.util.List;
 
-public interface EntityManager {
-    void save(Object entity);
+public class EntityManager implements UtilEntityManager{
+    private static EntityManager thisInstance;
+    private final EntityKeeper entityKeeper;
+    private final ConnectionManager connectionManager;
 
-    void saveAll(List<Object> entityList);
+    public EntityManager() {
+        this.entityKeeper = EntityKeeperWrapper.createEntityKeeperWrapper();
+        this.connectionManager = SimpleConnectionManagerImpl.create();
 
-    void update(Object entity);
+    }
 
-    Object read(String id, Class<?> entityClass);
+    @Override
+    public void save(Object entity) {
 
-    List<Object> readAll(Class<?> entityClass);
+    }
 
-    void delete(Object entity);
+    @Override
+    public void saveAll(List<Object> entityList) {
 
-    void deleteAll(List<Object> deletedEntities);
+    }
 
-    void dropTable(Class<?> entityClass);
+    @Override
+    public void update(Object entity) {
+
+    }
+
+    @Override
+    public <T> T read(String id, Class<T> entityClass) {
+        return null;
+    }
+
+    @Override
+    public <T> List<T> readAll(Class<T> entityClass) {
+        return null;
+    }
+
+    @Override
+    public void delete(Object entity) {
+
+    }
+
+    @Override
+    public void deleteAll(List<Object> deletedEntities) {
+
+    }
+
+    @Override
+    public void dropTable(Class<?> entityClass) {
+
+    }
 }

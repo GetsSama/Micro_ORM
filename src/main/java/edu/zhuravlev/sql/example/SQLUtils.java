@@ -91,13 +91,12 @@ class SQLUtils {
         }
     }
 
-     static boolean isDBContainsMapping (Connection connection, Class entityClass) {
+     static boolean isDBContainsMapping (Connection connection, String tableName, Class<?> entityClass) {
         Objects.requireNonNull(connection);
-        Objects.requireNonNull(entityClass);
+        Objects.requireNonNull(tableName);
 
         List<String> entityFields = Arrays.asList(EntityAnalyser.getFieldsName(entityClass));
         List<String> tableFieldsName = new ArrayList<>();
-        String tableName = entityClass.getSimpleName().toLowerCase();
         String query = "SELECT * FROM " + tableName + " LIMIT 3";
 
         try(ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {

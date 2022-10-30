@@ -8,7 +8,7 @@ public class EntityKeeperWrapper implements EntityKeeper {
 
     private EntityKeeperWrapper(){};
 
-    public EntityKeeperWrapper createEntityKeeperWrapper() {
+    public static EntityKeeper createEntityKeeperWrapper() {
         if (thisInstance == null)
             thisInstance = new EntityKeeperWrapper();
         return thisInstance;

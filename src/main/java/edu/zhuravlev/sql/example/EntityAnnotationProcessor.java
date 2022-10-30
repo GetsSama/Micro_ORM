@@ -6,4 +6,7 @@ public interface EntityAnnotationProcessor {
     List<Class<?>> getEntityClasses ();
     String getTableName(Class<?> entityClass);
     String getIdName(Class<?> entityClass);
+    static boolean isEntityClass(Class<?> clazz) {
+        return false;
+    }
 }
