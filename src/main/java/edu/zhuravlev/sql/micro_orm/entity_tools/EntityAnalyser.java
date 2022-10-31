@@ -1,4 +1,6 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.entity_tools;
+
+import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -6,7 +8,7 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.util.*;
 
-class EntityAnalyser {
+public class EntityAnalyser {
     private EntityAnalyser(){};
 
     private static String getterName(String fieldName) {
@@ -56,8 +58,7 @@ class EntityAnalyser {
     public static Map<String, String> getFieldsNameAndType(Class<?> entityClass){
         Objects.requireNonNull(entityClass);
 
-        Field[] fields = {};
-        fields = entityClass.getDeclaredFields();
+        Field[] fields = entityClass.getDeclaredFields();
 
         if (fields.length != 0) {
             Map<String, String> nameAndType = new LinkedHashMap<>((int) (fields.length/0.8));
@@ -90,10 +91,10 @@ class EntityAnalyser {
         return values;
     }
 
-    public static String getId(Object o) {
+    public static String getId(Object o, String idName) {
         Objects.requireNonNull(o);
         try {
-            Object value = o.getClass().getMethod("getId").invoke(o);
+            Object value = o.getClass().getMethod(idName).invoke(o);
             return value.toString();
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);

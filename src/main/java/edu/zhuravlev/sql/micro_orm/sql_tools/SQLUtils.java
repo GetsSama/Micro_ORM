@@ -1,18 +1,15 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.sql_tools;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnalyser;
 
-import javax.sql.RowSet;
-import javax.sql.rowset.RowSetFactory;
-import javax.sql.rowset.RowSetProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
-import java.util.function.Function;
 
-class SQLUtils {
+public class SQLUtils {
     private SQLUtils(){};
     private static final Map<String, Method> dataTypesMapping;
     private static final Map<String, Method> dataReadTypesMapping;
@@ -91,13 +88,12 @@ class SQLUtils {
         }
     }
 
-     static boolean isDBContainsMapping (Connection connection, Class entityClass) {
+    public static boolean isDBContainsMapping (Connection connection, String tableName, Class<?> entityClass) {
         Objects.requireNonNull(connection);
-        Objects.requireNonNull(entityClass);
+        Objects.requireNonNull(tableName);
 
         List<String> entityFields = Arrays.asList(EntityAnalyser.getFieldsName(entityClass));
         List<String> tableFieldsName = new ArrayList<>();
-        String tableName = entityClass.getSimpleName().toLowerCase();
         String query = "SELECT * FROM " + tableName + " LIMIT 3";
 
         try(ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), null, tableName, null)) {
@@ -130,7 +126,7 @@ class SQLUtils {
             return false;
 
         return true;
-     }
+    }
 
     public static void setPrepareStatementParams (PreparedStatement prSt, Map<String, String> nameAndTypes, String... attrValues) {
         List<Object> attrValuesAsObj = getAttributesAsObjs(nameAndTypes, attrValues);
