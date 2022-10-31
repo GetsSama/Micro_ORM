@@ -1,8 +1,8 @@
 package edu.zhuravlev.sql.exampleTest;
 
-import edu.zhuravlev.sql.example.TmpConnectionRealization;
-import edu.zhuravlev.sql.example.EntityKeeper;
-import edu.zhuravlev.sql.example.EntityKeeperWrapper;
+import edu.zhuravlev.sql.micro_orm.db_connection.TmpConnectionRealization;
+import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeper;
+import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeperWrapper;
 
 import java.sql.*;
 import java.util.Arrays;

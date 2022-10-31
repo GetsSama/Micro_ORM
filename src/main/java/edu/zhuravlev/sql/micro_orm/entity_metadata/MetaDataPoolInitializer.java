@@ -1,4 +1,8 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.entity_metadata;
+
+import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnalyser;
+import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnnotationProcessor;
+import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
 import java.sql.Connection;
 import java.util.List;

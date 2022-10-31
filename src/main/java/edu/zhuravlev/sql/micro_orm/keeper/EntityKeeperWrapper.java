@@ -1,4 +1,6 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.keeper;
+
+import edu.zhuravlev.sql.micro_orm.entity_metadata.EntityMetaData;
 
 import java.sql.Connection;
 import java.util.List;

@@ -1,4 +1,9 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.keeper;
+
+import edu.zhuravlev.sql.micro_orm.entity_metadata.EntityMetaData;
+import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnalyser;
+import edu.zhuravlev.sql.micro_orm.sql_tools.SQLCreator;
+import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -6,8 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-
-import static edu.zhuravlev.sql.example.SQLUtils.*;
 
 class SimpleEntityKeeperImpl implements EntityKeeper {
 
@@ -48,11 +51,11 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
 
         String[] values = EntityAnalyser.getValues(entity, entityData.getFieldsNameAndType());
         String insertSQL = SQLCreator.getInsertStatement(entityData.getTableName(), entityData.getFieldsNameAndType(), values);
-        printGeneratedSQL(insertSQL);
+        SQLUtils.printGeneratedSQL(insertSQL);
 
         try (Statement statement = connection.createStatement()) {
             int updRows = statement.executeUpdate(insertSQL);
-            printExecutedResult(updRows, "inserted");
+            SQLUtils.printExecutedResult(updRows, "inserted");
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
@@ -75,21 +78,21 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
             for (var entity : entityList) {
                 values = EntityAnalyser.getValues(entity, entityData.getFieldsNameAndType());
                 insertedSQL = SQLCreator.getInsertStatement(entityData.getTableName(), entityData.getFieldsNameAndType(), values);
-                printGeneratedSQL(insertedSQL);
+                SQLUtils.printGeneratedSQL(insertedSQL);
                 statement.addBatch(insertedSQL);
                 counter++;
                 if(counter==batchLimit) {
                     int[] updRows = statement.executeBatch();
-                    printExecutedResult(updRows.length, "inserted");
+                    SQLUtils.printExecutedResult(updRows.length, "inserted");
                     counter = 0;
                 }
             }
             if(counter != 0) {
                 int[] updRows = statement.executeBatch();
-                printExecutedResult(updRows.length, "inserted");
+                SQLUtils.printExecutedResult(updRows.length, "inserted");
             }
         } catch (SQLException e) {
-            printSQLException(e);
+            SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
         }
     }
@@ -122,11 +125,11 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
 
         try(Statement statement = connection.createStatement()) {
             String updateSQL = SQLCreator.getUpdateStatement(entityData.getTableName(), fieldAndValue, fieldAndValue.get(entityData.getIdFieldName()));
-            printGeneratedSQL(updateSQL);
+            SQLUtils.printGeneratedSQL(updateSQL);
             int updRows = statement.executeUpdate(updateSQL);
-            printExecutedResult(updRows, "updated");
+            SQLUtils.printExecutedResult(updRows, "updated");
         } catch (SQLException e) {
-            printSQLException(e);
+            SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
         }
     }
@@ -145,14 +148,14 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
 
         try(Statement statement = connection.createStatement()) {
             String selectSQL = SQLCreator.getSelectStatement(entityData.getTableName(), id);
-            printGeneratedSQL(selectSQL);
+            SQLUtils.printGeneratedSQL(selectSQL);
             ResultSet resultSet = statement.executeQuery(selectSQL);
 
             if(resultSet.next())
                 EntityAnalyser.setFields(entityInstance, resultSet, entityData.getFieldsNameAndType());
 
         } catch (SQLException e) {
-            printSQLException(e);
+            SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
         }
 
@@ -169,7 +172,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
 
         try(Statement statement = connection.createStatement()) {
             String readAllSQL = "SELECT * FROM " + entityData.getTableName();
-            printGeneratedSQL(readAllSQL);
+            SQLUtils.printGeneratedSQL(readAllSQL);
             ResultSet resultSet = statement.executeQuery(readAllSQL);
 
             while (resultSet.next()) {
@@ -183,7 +186,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
             }
 
         } catch (SQLException e) {
-            printSQLException(e);
+            SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
         }
 
@@ -198,11 +201,11 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
 
         String idValue = EntityAnalyser.getId(entity, entityData.getIdFieldName());
         String deleteSQL = SQLCreator.getDeleteStatement(entityData.getTableName(), idValue);
-        printGeneratedSQL(deleteSQL);
+        SQLUtils.printGeneratedSQL(deleteSQL);
 
         try(Statement statement = connection.createStatement()) {
             int updRows = statement.executeUpdate(deleteSQL);
-            printExecutedResult(updRows, "deleted");
+            SQLUtils.printExecutedResult(updRows, "deleted");
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
@@ -225,21 +228,21 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
             for (var entity : deletedEntities) {
                 String idValue = EntityAnalyser.getId(entity, entityData.getIdFieldName());
                 String deleteSQL = SQLCreator.getDeleteStatement(entityData.getTableName(), idValue);
-                printGeneratedSQL(deleteSQL);
+                SQLUtils.printGeneratedSQL(deleteSQL);
                 statement.addBatch(deleteSQL);
                 counter++;
                 if(counter==batchLimit) {
                     int[] updRows = statement.executeBatch();
-                    printExecutedResult(updRows.length, "deleted");
+                    SQLUtils.printExecutedResult(updRows.length, "deleted");
                     counter = 0;
                 }
             }
             if(counter != 0) {
                 int[] updRows = statement.executeBatch();
-                printExecutedResult(updRows.length, "deleted");
+                SQLUtils.printExecutedResult(updRows.length, "deleted");
             }
         } catch (SQLException e) {
-            printSQLException(e);
+            SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
         }
     }
@@ -248,13 +251,13 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
     public void dropTable(EntityMetaData entityData, Connection connection) {
         try(Statement statement = connection.createStatement()) {
             String dropSQL = SQLCreator.getDropStatement(entityData.getTableName());
-            printGeneratedSQL(dropSQL);
+            SQLUtils.printGeneratedSQL(dropSQL);
             statement.executeUpdate(dropSQL);
             System.out.println("Drop " + entityData.getTableName() + " table");
             entityData.tableDropped();
             //KeeperPool.removeMapping(thisEntityClass);
         } catch (SQLException e) {
-            printSQLException(e);
+            SQLUtils.printSQLException(e);
             throw new RuntimeException(e);
         }
     }

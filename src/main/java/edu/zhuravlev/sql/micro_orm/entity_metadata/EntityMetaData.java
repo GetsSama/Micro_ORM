@@ -1,4 +1,4 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.entity_metadata;
 
 import java.util.Map;
 

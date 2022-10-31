@@ -1,10 +1,10 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.entity_metadata;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-class MetaDataPool {
+public class MetaDataPool {
     private static final Map<Class<?>, EntityMetaData> entityMapping = new HashMap<>();
 
     private MetaDataPool(){};

@@ -1,10 +1,12 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.db_connection;
+
+import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class TmpConnectionRealization {
+class TmpConnectionRealization {
     private static final String url = "jdbc:postgresql://localhost/crud_edu";
     private static final String user = "postgres";
     private static final String pass = "520621df";

@@ -1,4 +1,9 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm;
+
+import edu.zhuravlev.sql.micro_orm.db_connection.ConnectionManager;
+import edu.zhuravlev.sql.micro_orm.db_connection.SimpleConnectionManagerImpl;
+import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeper;
+import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeperWrapper;
 
 import java.util.List;
 

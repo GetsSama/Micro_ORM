@@ -1,4 +1,6 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.entity_tools;
+
+import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -6,7 +8,7 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.util.*;
 
-class EntityAnalyser {
+public class EntityAnalyser {
     private EntityAnalyser(){};
 
     private static String getterName(String fieldName) {

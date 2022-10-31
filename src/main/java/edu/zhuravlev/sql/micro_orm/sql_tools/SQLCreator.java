@@ -1,8 +1,8 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.sql_tools;
 
 import java.util.Map;
 
-class SQLCreator {
+public class SQLCreator {
     private SQLCreator() {};
 
     private static final String CREATE_TEMPLATE = "CREATE TABLE %s ";
