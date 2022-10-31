@@ -1,28 +1,32 @@
 package edu.zhuravlev.sql.exampleTest;
 
 import com.google.common.base.Objects;
+import edu.zhuravlev.sql.micro_orm.annotations.Entity;
+import edu.zhuravlev.sql.micro_orm.annotations.Id;
 
+@Entity("Machines")
 public class Car {
-    private String id;
+    @Id
+    private String gosNumber;
     private String model;
     private int maxSpeed;
     private int horsPower;
 
     public Car(){};
 
-    public Car(String id, String model, int maxSpeed, int horsPower) {
-        this.id = id;
+    public Car(String gos_number, String model, int maxSpeed, int horsPower) {
+        this.gosNumber = gos_number;
         this.model = model;
         this.maxSpeed = maxSpeed;
         this.horsPower = horsPower;
     }
 
-    public String getId() {
-        return id;
+    public String getGosNumber() {
+        return gosNumber;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setGosNumber(String gosNumber) {
+        this.gosNumber = gosNumber;
     }
 
     public String getModel() {
@@ -54,18 +58,18 @@ public class Car {
         if (this == o) return true;
         if (!(o instanceof Car)) return false;
         Car car = (Car) o;
-        return maxSpeed == car.maxSpeed && horsPower == car.horsPower && Objects.equal(id, car.id) && Objects.equal(model, car.model);
+        return maxSpeed == car.maxSpeed && horsPower == car.horsPower && Objects.equal(gosNumber, car.gosNumber) && Objects.equal(model, car.model);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, model, maxSpeed, horsPower);
+        return Objects.hashCode(gosNumber, model, maxSpeed, horsPower);
     }
 
     @Override
     public String toString() {
         return "Car{" +
-                "id='" + id + '\'' +
+                "id='" + gosNumber + '\'' +
                 ", Model='" + model + '\'' +
                 ", maxSpeed=" + maxSpeed +
                 ", horsPower=" + horsPower +

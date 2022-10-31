@@ -1,5 +1,7 @@
 package edu.zhuravlev.sql.micro_orm.entity_tools;
 
+import edu.zhuravlev.sql.micro_orm.annotations.Entity;
+
 import java.util.List;
 
 public interface EntityAnnotationProcessor {
@@ -7,6 +9,6 @@ public interface EntityAnnotationProcessor {
     String getTableName(Class<?> entityClass);
     String getIdName(Class<?> entityClass);
     static boolean isEntityClass(Class<?> clazz) {
-        return false;
+        return clazz.isAnnotationPresent(Entity.class);
     }
 }

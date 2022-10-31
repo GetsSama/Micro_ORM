@@ -1,7 +1,15 @@
 package edu.zhuravlev.sql.micro_orm.entity_tools;
 
+import edu.zhuravlev.sql.micro_orm.annotations.Entity;
+import edu.zhuravlev.sql.micro_orm.annotations.Id;
 import edu.zhuravlev.sql.micro_orm.entity_metadata.SimpleEntityMetaDataImpl;
+import edu.zhuravlev.sql.micro_orm.resources_manager.ClassFinder;
+import edu.zhuravlev.sql.micro_orm.resources_manager.ResourcesAnalyzer;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcessor{
@@ -17,16 +25,47 @@ public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcesso
 
     @Override
     public List<Class<?>> getEntityClasses() {
-        return null;
+        String context = ResourcesAnalyzer.getSearchArea();
+        List<Class<?>> allClassesInContext = ClassFinder.find(context);
+        List<Class<?>> entityClasses = new ArrayList<>(allClassesInContext.size());
+
+        for (var clazz : allClassesInContext)
+            if (clazz.isAnnotationPresent(Entity.class))
+                entityClasses.add(clazz);
+
+        if (!entityClasses.isEmpty())
+            return entityClasses;
+        else
+            throw new RuntimeException("In search area '" + context + "' no Entity classes!");
     }
 
     @Override
     public String getTableName(Class<?> entityClass) {
-        return null;
+        if (EntityAnnotationProcessor.isEntityClass(entityClass)) {
+            Entity entityAnno = entityClass.getAnnotation(Entity.class);
+            String value = entityAnno.value();
+            if (value.equals("default_class_name"))
+                return entityClass.getSimpleName();
+            else
+                return value;
+        } else
+            throw new RuntimeException("Given class '" + entityClass.getName() + "' no Entity class!");
     }
 
     @Override
     public String getIdName(Class<?> entityClass) {
-        return null;
+        if (EntityAnnotationProcessor.isEntityClass(entityClass)) {
+            List<Field> fields = Arrays.asList(entityClass.getDeclaredFields());
+            if (fields.isEmpty())
+                throw new RuntimeException("Class " + entityClass.getName() + " haven't got any fields!");
+
+            for (var field : fields) {
+                if (field.isAnnotationPresent(Id.class))
+                    return field.getName();
+            }
+
+            throw new RuntimeException("Entity class '" + entityClass.getName() + "' haven't got Id!");
+        } else
+            throw new RuntimeException("Given class '" + entityClass.getName() + "' no Entity class!");
     }
 }

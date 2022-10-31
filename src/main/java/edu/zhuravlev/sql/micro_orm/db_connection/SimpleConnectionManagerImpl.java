@@ -20,6 +20,11 @@ public class SimpleConnectionManagerImpl implements ConnectionManager {
 
     @Override
     public void returnConnection(Connection connection) {
+        //TmpConnectionRealization.close();
+    }
+
+    //temporary realisation
+    public static void close() {
         TmpConnectionRealization.close();
     }
 }
