@@ -1,18 +1,15 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.sql_tools;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnalyser;
 
-import javax.sql.RowSet;
-import javax.sql.rowset.RowSetFactory;
-import javax.sql.rowset.RowSetProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
-import java.util.function.Function;
 
-class SQLUtils {
+public class SQLUtils {
     private SQLUtils(){};
     private static final Map<String, Method> dataTypesMapping;
     private static final Map<String, Method> dataReadTypesMapping;
@@ -91,7 +88,7 @@ class SQLUtils {
         }
     }
 
-     static boolean isDBContainsMapping (Connection connection, String tableName, Class<?> entityClass) {
+    public static boolean isDBContainsMapping (Connection connection, String tableName, Class<?> entityClass) {
         Objects.requireNonNull(connection);
         Objects.requireNonNull(tableName);
 
@@ -119,17 +116,22 @@ class SQLUtils {
         }
 
         if (entityFields.size() == tableFieldsName.size()) {
-            Iterator<String> iteratorEntity = entityFields.iterator();
-            for (int i=0; i<entityFields.size(); i++) {
-                String field = iteratorEntity.next();
-                if(!field.equalsIgnoreCase(tableFieldsName.get(i)))
+            for (String field : tableFieldsName) {
+                boolean flag = false;
+                for (String entityField : entityFields) {
+                    if (field.equalsIgnoreCase(entityField)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag)
                     return false;
             }
         } else
             return false;
 
         return true;
-     }
+    }
 
     public static void setPrepareStatementParams (PreparedStatement prSt, Map<String, String> nameAndTypes, String... attrValues) {
         List<Object> attrValuesAsObj = getAttributesAsObjs(nameAndTypes, attrValues);

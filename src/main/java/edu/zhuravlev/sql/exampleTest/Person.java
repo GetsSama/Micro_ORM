@@ -1,9 +1,13 @@
 package edu.zhuravlev.sql.exampleTest;
 
+import edu.zhuravlev.sql.micro_orm.annotations.Entity;
+import edu.zhuravlev.sql.micro_orm.annotations.Id;
+
 import java.util.Objects;
 
+@Entity
 public class Person {
-
+    @Id
     private int id;
     private String name;
     private String email;

@@ -1,4 +1,4 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.db_connection;
 
 import java.sql.Connection;
 
@@ -20,6 +20,11 @@ public class SimpleConnectionManagerImpl implements ConnectionManager {
 
     @Override
     public void returnConnection(Connection connection) {
+        //TmpConnectionRealization.close();
+    }
+
+    //temporary realisation
+    public static void close() {
         TmpConnectionRealization.close();
     }
 }

@@ -1,10 +1,10 @@
-package edu.zhuravlev.sql.example;
+package edu.zhuravlev.sql.micro_orm.entity_metadata;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-class MetaDataPool {
+public class MetaDataPool {
     private static final Map<Class<?>, EntityMetaData> entityMapping = new HashMap<>();
 
     private MetaDataPool(){};
@@ -17,6 +17,11 @@ class MetaDataPool {
     public static EntityMetaData getMetaData(Object entity) {
         Objects.requireNonNull(entity);
         return entityMapping.get(entity.getClass());
+    }
+
+    public static EntityMetaData getMetaData(Class<?> entityClass) {
+        Objects.requireNonNull(entityClass);
+        return entityMapping.get(entityClass);
     }
 
     public static void addMetaData(Class<?> entityClass, EntityMetaData entityMetaData) {
