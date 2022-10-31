@@ -19,6 +19,11 @@ public class MetaDataPool {
         return entityMapping.get(entity.getClass());
     }
 
+    public static EntityMetaData getMetaData(Class<?> entityClass) {
+        Objects.requireNonNull(entityClass);
+        return entityMapping.get(entityClass);
+    }
+
     public static void addMetaData(Class<?> entityClass, EntityMetaData entityMetaData) {
         Objects.requireNonNull(entityClass);
         Objects.requireNonNull(entityMetaData);

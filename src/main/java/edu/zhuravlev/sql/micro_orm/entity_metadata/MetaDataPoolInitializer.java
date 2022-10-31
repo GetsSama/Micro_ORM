@@ -19,7 +19,8 @@ public class MetaDataPoolInitializer {
             builder.addFieldsNameAndType(EntityAnalyser.getFieldsNameAndType(clazz));
             builder.addTableName(tableName);
             builder.addIdFieldName(annotationProcessor.getIdName(clazz));
-            builder.addIsTableExist(SQLUtils.isDBContainsMapping(connection, tableName));
+            builder.addIsTableExist(SQLUtils.isDBContainsMapping(connection, tableName, clazz));
+            MetaDataPool.addMetaData(clazz, builder.built());
         }
     }
 }
