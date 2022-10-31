@@ -2,32 +2,31 @@ package edu.zhuravlev.sql.micro_orm.resources_manager;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 
 public class ResourcesAnalyzer {
     private ResourcesAnalyzer(){}
-
-    //------------------------------------------------------------------------------------------------------------
-    /*
-    The path to resource dir and file could search automatically. Now it is hardcode.
-    */
-    //------------------------------------------------------------------------------------------------------------
     public static String getSearchArea() {
-        String searchAreaPath = null;
+        String searchAreaPath;
+        String defaultResource = "scope.txt";
 
-        //!!!!!!!!!!!!!!!!!!!!!
-        String defaultResource = "C:\\Users\\User\\IdeaProjects\\postgresqlCRUD\\src\\main\\resources\\scope.txt";
-        //!!!!!!!!!!!!!!!!!!!!!
+        URL resource = Thread.currentThread().getContextClassLoader().getResource(defaultResource);
 
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(defaultResource)))) {
+        if (resource == null) {
+            throw new IllegalArgumentException("Unable to get resource '" + defaultResource + "' Are you sure the resources exists?");
+        }
+
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(resource.getFile())))) {
             String path = br.readLine();
             if (path != null)
                 searchAreaPath = path;
+            else
+                throw new RuntimeException("Empty resource file '" + defaultResource + "'");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         return searchAreaPath;
     }
+
+
 }
