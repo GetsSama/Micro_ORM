@@ -94,7 +94,8 @@ public class EntityAnalyser {
     public static String getId(Object o, String idName) {
         Objects.requireNonNull(o);
         try {
-            Object value = o.getClass().getMethod(idName).invoke(o);
+            String idGetter = getterName(idName);
+            Object value = o.getClass().getMethod(idGetter).invoke(o);
             return value.toString();
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);

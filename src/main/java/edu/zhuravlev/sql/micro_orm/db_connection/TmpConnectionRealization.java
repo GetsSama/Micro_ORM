@@ -42,7 +42,7 @@ class TmpConnectionRealization {
     private static void createConnect() {
         try {
             connectionInst = DriverManager.getConnection(url, user, pass);
-            System.out.println("Connection successful!");
+            System.out.println("Connection with DB successful!");
         } catch (SQLException e) {
             SQLUtils.printSQLException(e);
             throw new RuntimeException(e);

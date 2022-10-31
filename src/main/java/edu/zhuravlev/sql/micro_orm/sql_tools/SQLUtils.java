@@ -116,10 +116,15 @@ public class SQLUtils {
         }
 
         if (entityFields.size() == tableFieldsName.size()) {
-            Iterator<String> iteratorEntity = entityFields.iterator();
-            for (int i=0; i<entityFields.size(); i++) {
-                String field = iteratorEntity.next();
-                if(!field.equalsIgnoreCase(tableFieldsName.get(i)))
+            for (String field : tableFieldsName) {
+                boolean flag = false;
+                for (String entityField : entityFields) {
+                    if (field.equalsIgnoreCase(entityField)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag)
                     return false;
             }
         } else
