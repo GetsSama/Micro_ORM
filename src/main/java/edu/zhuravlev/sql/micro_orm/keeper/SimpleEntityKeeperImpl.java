@@ -75,7 +75,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
             int counter = 0;
             String[] values;
             String insertedSQL;
-            for (var entity : entityList) {
+            for (Object entity : entityList) {
                 values = EntityAnalyser.getValues(entity, entityData.getFieldsNameAndType());
                 insertedSQL = SQLCreator.getInsertStatement(entityData.getTableName(), entityData.getFieldsNameAndType(), values);
                 SQLUtils.printGeneratedSQL(insertedSQL);
@@ -107,7 +107,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
         Map<String, String> fieldAndValue = new LinkedHashMap<>();
         Iterator<String> valIter = valuesEntity.iterator();
 
-        for(var field : entityData.getFieldsNameAndType().keySet())
+        for(String field : entityData.getFieldsNameAndType().keySet())
             fieldAndValue.put(field, valIter.next());
 
 
@@ -116,7 +116,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
         Iterator<String> oldIter = valuesEntityInDB.iterator();
         Iterator<String> newIter = valuesEntity.iterator();
 
-        for(var pair : fieldAndValue.entrySet()){
+        for(Map.Entry<String, String> pair : fieldAndValue.entrySet()){
             String oldValue = oldIter.next();
             String newValue = newIter.next();
             if(!oldValue.equals(newValue))
@@ -225,7 +225,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
             int counter = 0;
             String[] values;
             String insertedSQL;
-            for (var entity : deletedEntities) {
+            for (Object entity : deletedEntities) {
                 String idValue = EntityAnalyser.getId(entity, entityData.getIdFieldName());
                 String deleteSQL = SQLCreator.getDeleteStatement(entityData.getTableName(), idValue);
                 SQLUtils.printGeneratedSQL(deleteSQL);

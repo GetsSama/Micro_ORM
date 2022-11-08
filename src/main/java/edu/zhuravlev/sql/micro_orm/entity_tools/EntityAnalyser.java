@@ -63,7 +63,7 @@ public class EntityAnalyser {
         if (fields.length != 0) {
             Map<String, String> nameAndType = new LinkedHashMap<>((int) (fields.length/0.8));
 
-            for (var field : fields)
+            for (Field field : fields)
                 nameAndType.put(field.getName(), field.getType().getSimpleName());
 
             return nameAndType;
@@ -109,7 +109,7 @@ public class EntityAnalyser {
 
         try {
             int counter = 1;
-            for(var pair : fieldsNameAndType.entrySet()) {
+            for(Map.Entry<String, String> pair : fieldsNameAndType.entrySet()) {
                 Method rsMethod = SQLUtils.getResultSetReadMethod(pair.getValue());
                 Object value = rsMethod.invoke(resultSet, counter);
                 String setterName = setterName(pair.getKey());

@@ -29,7 +29,7 @@ public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcesso
         List<Class<?>> allClassesInContext = ClassFinder.find(context);
         List<Class<?>> entityClasses = new ArrayList<>(allClassesInContext.size());
 
-        for (var clazz : allClassesInContext)
+        for (Class<?> clazz : allClassesInContext)
             if (clazz.isAnnotationPresent(Entity.class))
                 entityClasses.add(clazz);
 
@@ -59,7 +59,7 @@ public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcesso
             if (fields.isEmpty())
                 throw new RuntimeException("Class " + entityClass.getName() + " haven't got any fields!");
 
-            for (var field : fields) {
+            for (Field field : fields) {
                 if (field.isAnnotationPresent(Id.class))
                     return field.getName();
             }

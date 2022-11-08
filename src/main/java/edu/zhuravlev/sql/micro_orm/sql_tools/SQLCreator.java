@@ -15,7 +15,7 @@ public class SQLCreator {
         StringBuilder builder = new StringBuilder(firstPart);
         builder.append("(");
 
-        for(var pair : fieldsNameAndType.entrySet()) {
+        for(Map.Entry<String, String> pair : fieldsNameAndType.entrySet()) {
             String name = pair.getKey();
             String typeJava = pair.getValue();
             String typeSQL = SQLUtils.typesSQLToJava.inverse().get(typeJava);
@@ -49,7 +49,7 @@ public class SQLCreator {
         int size = fieldsNameAndType.size();
         int counter = 1;
 
-        for (var pair : fieldsNameAndType.entrySet()) {
+        for (Map.Entry<String, String> pair : fieldsNameAndType.entrySet()) {
             if (counter != size) {
                 builder.append(pair.getKey() + ", ");
                 builderValues.append("'" + values[counter-1] + "'" + ", ");
@@ -69,7 +69,7 @@ public class SQLCreator {
         int size = updatableFieldAndValue.size();
         int counter = 1;
 
-        for (var pair : updatableFieldAndValue.entrySet()) {
+        for (Map.Entry<String, String> pair : updatableFieldAndValue.entrySet()) {
             if (counter != size)
                 builder.append(pair.getKey() + "='" + pair.getValue() + "', ");
             else

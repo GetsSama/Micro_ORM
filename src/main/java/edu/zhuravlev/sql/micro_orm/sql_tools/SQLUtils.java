@@ -18,19 +18,16 @@ public class SQLUtils {
 
     static {
         try {
-            dataTypesMapping = new HashMap<>(Map.of(
-                    "int4", PreparedStatement.class.getMethod("setInt", int.class, int.class),
-                    "text", PreparedStatement.class.getMethod("setString", int.class, String.class),
-                    "varchar", PreparedStatement.class.getMethod("setString", int.class, String.class)
-            ));
-            dataReadTypesMapping = new HashMap<>(Map.of(
-                    "int", ResultSet.class.getMethod("getInt", int.class),
-                    "String", ResultSet.class.getMethod("getString", int.class)
-            ));
-            typeAndClass = new HashMap<>(Map.of(
-                    "int", int.class,
-                    "String", String.class
-            ));
+            dataTypesMapping = new HashMap<>();
+            dataTypesMapping.put("int4", PreparedStatement.class.getMethod("setInt", int.class, int.class));
+            dataTypesMapping.put("text", PreparedStatement.class.getMethod("setString", int.class, String.class));
+            dataTypesMapping.put("varchar", PreparedStatement.class.getMethod("setString", int.class, String.class));
+            dataReadTypesMapping = new HashMap<>();
+            dataReadTypesMapping.put("int", ResultSet.class.getMethod("getInt", int.class));
+            dataReadTypesMapping.put("String", ResultSet.class.getMethod("getString", int.class));
+            typeAndClass = new HashMap<>();
+            typeAndClass.put("int", int.class);
+            typeAndClass.put("String", String.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -59,7 +56,7 @@ public class SQLUtils {
         List<Object> atrObj = new ArrayList<>(attributesValues.length);
         int counter = 0;
 
-        for (var key : nameAndType.keySet()) {
+        for (String key : nameAndType.keySet()) {
             //String javaType = sqlTypeAsJavaType.get(nameAndType.get(key));
             String javaType = typesSQLToJava.get(nameAndType.get(key));
             if (javaType.equals("int"))
@@ -137,7 +134,7 @@ public class SQLUtils {
         List<Object> attrValuesAsObj = getAttributesAsObjs(nameAndTypes, attrValues);
         int counter = 0;
 
-        for (var key : nameAndTypes.keySet()) {
+        for (String key : nameAndTypes.keySet()) {
             Method setMethod = dataTypesMapping.get(nameAndTypes.get(key));
 
             try {

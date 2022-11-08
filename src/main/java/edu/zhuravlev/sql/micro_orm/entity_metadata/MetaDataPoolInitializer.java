@@ -13,7 +13,7 @@ public class MetaDataPoolInitializer {
 
     public static void fillThePool(EntityAnnotationProcessor annotationProcessor, Connection connection) {
         List<Class<?>> entityClasses = annotationProcessor.getEntityClasses();
-        for (var clazz : entityClasses) {
+        for (Class<?> clazz : entityClasses) {
             EntityMetaDataBuilder builder = new EntityMetaDataBuilder();
             String tableName = annotationProcessor.getTableName(clazz).toLowerCase();
             builder.addEntityClass(clazz);
