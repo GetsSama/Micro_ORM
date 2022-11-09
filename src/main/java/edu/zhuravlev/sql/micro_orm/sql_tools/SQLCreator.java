@@ -7,7 +7,7 @@ public class SQLCreator {
 
     private static final String CREATE_TEMPLATE = "CREATE TABLE %s ";
 
-    public static String getCreateStatement(String tableName, Map<String, String> fieldsNameAndType) {
+    public static String getCreateStatement(String tableName, String idFieldName, Map<String, String> fieldsNameAndType) {
         String firstPart = String.format(CREATE_TEMPLATE, tableName);
         int size = fieldsNameAndType.size();
         int counter = 1;
@@ -20,7 +20,7 @@ public class SQLCreator {
             String typeJava = pair.getValue();
             String typeSQL = SQLUtils.typesSQLToJava.inverse().get(typeJava);
 
-            if(name.equalsIgnoreCase("id"))
+            if(name.equalsIgnoreCase(idFieldName))
                 builder.append(name.toUpperCase() + " " + typeSQL.toUpperCase() + " " + "PRIMARY KEY");
             else
                 builder.append(name.toUpperCase() + " " + typeSQL.toUpperCase());
@@ -36,9 +36,9 @@ public class SQLCreator {
         return builder.toString();
     }
 
-    public static String getSelectStatement(String tableName, String id) {
+    public static String getSelectStatement(String tableName, String idFieldName,  String id) {
         String firstPart = "SELECT * FROM " + tableName;
-        String secondPart = " WHERE id='" + id + "'";
+        String secondPart = " WHERE " + idFieldName + "='" + id + "'";
         return firstPart + secondPart;
     }
 

@@ -24,7 +24,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
 
     private int create(EntityMetaData entityData, Connection connection) {
         try(Statement statement = connection.createStatement()) {
-            String sqlStatement = SQLCreator.getCreateStatement(entityData.getTableName(), entityData.getFieldsNameAndType());
+            String sqlStatement = SQLCreator.getCreateStatement(entityData.getTableName(), entityData.getIdFieldName(), entityData.getFieldsNameAndType());
             System.out.println("Generated SQL -----> " + sqlStatement);
             int upd = statement.executeUpdate(sqlStatement);
             entityData.tableCreated();
@@ -147,7 +147,7 @@ class SimpleEntityKeeperImpl implements EntityKeeper {
         }
 
         try(Statement statement = connection.createStatement()) {
-            String selectSQL = SQLCreator.getSelectStatement(entityData.getTableName(), id);
+            String selectSQL = SQLCreator.getSelectStatement(entityData.getTableName(), entityData.getIdFieldName(), id);
             SQLUtils.printGeneratedSQL(selectSQL);
             ResultSet resultSet = statement.executeQuery(selectSQL);
 
