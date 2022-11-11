@@ -22,7 +22,7 @@ public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcesso
 
     @Override
     public List<Class<?>> getEntityClasses() {
-        String context = ResourcesAnalyzer.getEntitySearchArea();
+        String context = ResourcesAnalyzer.getOrmProperties().getProperty("scope");
         List<Class<?>> allClassesInContext = EntityClassFinder.find(context);
         List<Class<?>> entityClasses = new ArrayList<>(allClassesInContext.size());
 

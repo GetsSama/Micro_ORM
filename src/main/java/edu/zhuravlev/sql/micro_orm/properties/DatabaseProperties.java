@@ -1,24 +1,16 @@
-package edu.zhuravlev.sql.micro_orm.db_connection;
+package edu.zhuravlev.sql.micro_orm.properties;
 
-import edu.zhuravlev.sql.micro_orm.CommonProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-class DatabaseProperties implements CommonProperties {
+public class DatabaseProperties extends AbstractProperties {
     private String url;
     private String user;
     private String password;
     private String dbDriver;
-
-    DatabaseProperties() {}
-
-    DatabaseProperties(String url, String user, String password, String dbDriver) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
-        this.dbDriver = dbDriver;
-    }
 
     public String getUrl() {
         return url;
@@ -65,13 +57,15 @@ class DatabaseProperties implements CommonProperties {
     }
 
     @Override
-    public Map<String, String> getPropertiesMap() {
-        Map<String, String> propMap = new HashMap<>();
-        propMap.put("url", url);
-        propMap.put("user", user);
-        propMap.put("password", password);
-        propMap.put("dbDriver", dbDriver);
-        return propMap;
+    Map<String, String> getPropertiesMap() {
+        if (properties == null) {
+            properties = new HashMap<>();
+            properties.put("url", url);
+            properties.put("user", user);
+            properties.put("password", password);
+            properties.put("dbDriver", dbDriver);
+        }
+        return properties;
     }
 
     @Override
