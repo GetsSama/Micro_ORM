@@ -2,11 +2,8 @@ package edu.zhuravlev.sql.micro_orm.entity_tools;
 
 import edu.zhuravlev.sql.micro_orm.annotations.Entity;
 import edu.zhuravlev.sql.micro_orm.annotations.Id;
-import edu.zhuravlev.sql.micro_orm.entity_metadata.SimpleEntityMetaDataImpl;
-import edu.zhuravlev.sql.micro_orm.resources_manager.ClassFinder;
 import edu.zhuravlev.sql.micro_orm.resources_manager.ResourcesAnalyzer;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +22,8 @@ public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcesso
 
     @Override
     public List<Class<?>> getEntityClasses() {
-        String context = ResourcesAnalyzer.getSearchArea();
-        List<Class<?>> allClassesInContext = ClassFinder.find(context);
+        String context = ResourcesAnalyzer.getEntitySearchArea();
+        List<Class<?>> allClassesInContext = EntityClassFinder.find(context);
         List<Class<?>> entityClasses = new ArrayList<>(allClassesInContext.size());
 
         for (Class<?> clazz : allClassesInContext)

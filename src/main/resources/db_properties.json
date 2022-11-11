@@ -1,0 +1,6 @@
+{
+  "url": "jdbc:postgresql://localhost/crud_edu",
+  "user": "postgres",
+  "password": "520621df",
+  "dbDriver": "org.postgresql.Driver"
+}

@@ -1,11 +1,11 @@
-package edu.zhuravlev.sql.micro_orm.resources_manager;
+package edu.zhuravlev.sql.micro_orm.entity_tools;
 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassFinder {
+public class EntityClassFinder {
 
     private static final char PKG_SEPARATOR = '.';
 
