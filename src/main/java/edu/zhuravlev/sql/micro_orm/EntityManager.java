@@ -11,6 +11,7 @@ import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeper;
 import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeperWrapper;
 import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,9 +34,28 @@ public class EntityManager implements UtilEntityManager{
             throw new RuntimeException(e);
         }
     }
+
+    private EntityManager(DataSource dataSource) {
+        this.entityKeeper = EntityKeeperWrapper.createEntityKeeperWrapper();
+        this.connectionManager = ConnectionManagerFactory.createConnectionManager(dataSource);
+        this.annotationProcessor = SimpleEntityAnnotationProcessor.getEntityAnnotationProcessor();
+        try {
+            MetaDataPoolInitializer.fillThePool(annotationProcessor, connectionManager.getConnection());
+        } catch (SQLException e) {
+            SQLUtils.printSQLException(e);
+            throw new RuntimeException(e);
+        }
+    }
+
     public static EntityManager createEntityManager() {
         if (thisInstance == null)
             thisInstance = new EntityManager();
+        return thisInstance;
+    }
+
+    public static EntityManager createEntityManager(DataSource dataSource) {
+        if (thisInstance == null)
+            thisInstance = new EntityManager(dataSource);
         return thisInstance;
     }
 
