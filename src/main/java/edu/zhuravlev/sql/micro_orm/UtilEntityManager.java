@@ -18,4 +18,6 @@ public interface UtilEntityManager {
     void deleteAll(List<Object> deletedEntities);
 
     void dropTable(Class<?> entityClass);
+
+    void freeResources();
 }

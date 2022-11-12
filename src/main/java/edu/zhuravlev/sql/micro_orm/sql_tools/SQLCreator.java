@@ -36,6 +36,7 @@ public class SQLCreator {
         return builder.toString();
     }
 
+
     public static String getSelectStatement(String tableName, String idFieldName,  String id) {
         String firstPart = "SELECT * FROM " + tableName;
         String secondPart = " WHERE " + idFieldName + "='" + id + "'";
