@@ -6,7 +6,7 @@ import edu.zhuravlev.sql.micro_orm.entity_metadata.EntityMetaData;
 import edu.zhuravlev.sql.micro_orm.entity_metadata.MetaDataPool;
 import edu.zhuravlev.sql.micro_orm.entity_metadata.MetaDataPoolInitializer;
 import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnnotationProcessor;
-import edu.zhuravlev.sql.micro_orm.entity_tools.SimpleEntityAnnotationProcessor;
+import edu.zhuravlev.sql.micro_orm.entity_tools.EntityAnnotationProcessorFactory;
 import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeper;
 import edu.zhuravlev.sql.micro_orm.keeper.EntityKeeperWrapper;
 import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class EntityManager implements UtilEntityManager{
     private static EntityManager thisInstance;
     private final EntityKeeper entityKeeper;
@@ -26,7 +27,7 @@ public class EntityManager implements UtilEntityManager{
     private EntityManager() {
         this.entityKeeper = EntityKeeperWrapper.createEntityKeeperWrapper();
         this.connectionManager = ConnectionManagerFactory.createConnectionManager();
-        this.annotationProcessor = SimpleEntityAnnotationProcessor.getEntityAnnotationProcessor();
+        this.annotationProcessor = EntityAnnotationProcessorFactory.getEntityAnnotationProcessor();
         try {
             MetaDataPoolInitializer.fillThePool(annotationProcessor, connectionManager.getConnection());
         } catch (SQLException e) {
@@ -38,7 +39,7 @@ public class EntityManager implements UtilEntityManager{
     private EntityManager(DataSource dataSource) {
         this.entityKeeper = EntityKeeperWrapper.createEntityKeeperWrapper();
         this.connectionManager = ConnectionManagerFactory.createConnectionManager(dataSource);
-        this.annotationProcessor = SimpleEntityAnnotationProcessor.getEntityAnnotationProcessor();
+        this.annotationProcessor = EntityAnnotationProcessorFactory.getEntityAnnotationProcessor();
         try {
             MetaDataPoolInitializer.fillThePool(annotationProcessor, connectionManager.getConnection());
         } catch (SQLException e) {

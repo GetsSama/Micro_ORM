@@ -1,4 +1,4 @@
-package edu.zhuravlev.sql.micro_orm.resources_manager;
+package edu.zhuravlev.sql.micro_orm.properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zhuravlev.sql.micro_orm.properties.CommonProperties;

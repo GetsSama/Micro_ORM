@@ -2,14 +2,14 @@ package edu.zhuravlev.sql.micro_orm.entity_tools;
 
 import edu.zhuravlev.sql.micro_orm.annotations.Entity;
 import edu.zhuravlev.sql.micro_orm.annotations.Id;
-import edu.zhuravlev.sql.micro_orm.resources_manager.ResourcesAnalyzer;
+import edu.zhuravlev.sql.micro_orm.properties.ResourcesAnalyzer;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SimpleEntityAnnotationProcessor implements EntityAnnotationProcessor{
+class SimpleEntityAnnotationProcessor implements EntityAnnotationProcessor{
     private static SimpleEntityAnnotationProcessor thisInstance;
 
     private SimpleEntityAnnotationProcessor(){}
