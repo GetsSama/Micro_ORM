@@ -2,7 +2,7 @@ package edu.zhuravlev.sql.micro_orm.entity_metadata;
 
 import java.util.Map;
 
-public class SimpleEntityMetaDataImpl implements EntityMetaData{
+class SimpleEntityMetaDataImpl implements EntityMetaData{
     private final Map<String, String> fieldsNameAndType;
     private final String tableName;
     private final String idFieldName;

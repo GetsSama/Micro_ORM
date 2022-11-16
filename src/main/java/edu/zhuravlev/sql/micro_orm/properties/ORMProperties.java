@@ -1,11 +1,9 @@
 package edu.zhuravlev.sql.micro_orm.properties;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class ORMProperties extends AbstractProperties{
+class ORMProperties extends AbstractProperties{
     private String scope;
 
     public String getScope() {

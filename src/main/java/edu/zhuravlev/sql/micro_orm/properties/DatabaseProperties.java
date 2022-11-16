@@ -1,12 +1,9 @@
 package edu.zhuravlev.sql.micro_orm.properties;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class DatabaseProperties extends AbstractProperties {
+class DatabaseProperties extends AbstractProperties {
     private String url;
     private String user;
     private String password;

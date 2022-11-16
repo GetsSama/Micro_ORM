@@ -14,7 +14,7 @@ public class SQLUtils {
     private static final Map<String, Method> dataTypesMapping;
     private static final Map<String, Method> dataReadTypesMapping;
 
-    private static final Map<String, Class> typeAndClass;
+    private static final Map<String, Class<?>> typeAndClass;
 
     static {
         try {
@@ -33,17 +33,11 @@ public class SQLUtils {
         }
     }
 
-    /*private static final Map<String, String> sqlTypeAsJavaType = new HashMap<>(Map.of(
-            "int4" ,"int",
-            "text" , "String",
-            "varchar" , "String"
-    ));*/
-
     public static Method getResultSetReadMethod(String expectedType) {
         return dataReadTypesMapping.get(expectedType);
     }
 
-    public static Class getClassByType(String type) {
+    public static Class<?> getClassByType(String type) {
         return typeAndClass.get(type);
     }
 

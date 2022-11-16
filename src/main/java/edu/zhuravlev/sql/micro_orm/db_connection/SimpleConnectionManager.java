@@ -1,7 +1,7 @@
 package edu.zhuravlev.sql.micro_orm.db_connection;
 
 import edu.zhuravlev.sql.micro_orm.properties.CommonProperties;
-import edu.zhuravlev.sql.micro_orm.resources_manager.ResourcesAnalyzer;
+import edu.zhuravlev.sql.micro_orm.properties.ResourcesAnalyzer;
 import edu.zhuravlev.sql.micro_orm.sql_tools.SQLUtils;
 
 import java.sql.*;
